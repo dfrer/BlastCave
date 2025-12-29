@@ -59,4 +59,4 @@ func _play_toggle_sound() -> void:
 	for i in range(frames):
 		var t = float(i) / mix_rate
 		var sample = sin(TAU * frequency * t) * amplitude
-		playback.push_frame(AudioFrame(sample, sample))
+		playback.push_frame(AudioFrame.new(sample, sample))
