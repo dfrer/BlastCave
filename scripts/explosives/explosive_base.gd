@@ -13,6 +13,7 @@ func explode():
 	sphere.radius = blast_radius
 	query.shape = sphere
 	query.transform = global_transform
+	query.collide_with_areas = true
 	
 	var results = space_state.intersect_shape(query)
 	for result in results:

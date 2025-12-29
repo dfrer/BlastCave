@@ -1,7 +1,9 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/enemies/basic_enemy.tscn" id="1_enemy"]
 [ext_resource type="Script" path="res://scripts/core/damage_source.gd" id="2_damage"]
+[ext_resource type="Script" path="res://scripts/puzzles/blast_switch.gd" id="3_switch"]
+[ext_resource type="PackedScene" path="res://scenes/puzzles/gate.tscn" id="4_gate"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
 albedo_color = Color(0.25, 0.5, 0.3, 1)
@@ -17,6 +19,18 @@ albedo_color = Color(0.15, 0.4, 0.2, 1)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_3"]
 size = Vector3(6, 1, 6)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_1"]
+bottom_radius = 0.4
+top_radius = 0.4
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3"]
+albedo_color = Color(0.2, 0.2, 0.2, 1)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_1"]
+height = 0.5
+radius = 0.45
 
 [node name="Room02Traversal" type="Node3D"]
 
@@ -57,3 +71,25 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 1, 0)
 
 [node name="BasicEnemy2" parent="." instance=ExtResource("1_enemy")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 1, -4)
+
+[node name="Gate" parent="." instance=ExtResource("4_gate")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6)
+switch_path = NodePath("../BlastSwitch")
+
+[node name="BlastSwitch" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.25, 0)
+script = ExtResource("3_switch")
+required_impulse = 12.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BlastSwitch"]
+shape = SubResource("CylinderShape3D_1")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="BlastSwitch"]
+mesh = SubResource("CylinderMesh_1")
+material_override = SubResource("StandardMaterial3D_3")
+
+[node name="IndicatorLight" type="OmniLight3D" parent="BlastSwitch"]
+light_energy = 0.5
+shadow_enabled = true
+
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="BlastSwitch"]
