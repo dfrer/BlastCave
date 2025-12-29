@@ -34,6 +34,6 @@ func _update_upgrades(upgrades: Array) -> void:
 
 func _format_time(total_seconds: float) -> String:
 	var seconds = int(total_seconds)
-	var minutes = seconds / 60
+	var minutes = int(seconds / 60.0)
 	seconds = seconds % 60
 	return "%d:%02d" % [minutes, seconds]
