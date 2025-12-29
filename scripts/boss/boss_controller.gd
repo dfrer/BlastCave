@@ -1,6 +1,8 @@
 extends Node3D
 class_name BossController
 
+signal encounter_completed
+
 @export var gate_path: NodePath
 @export var reward_scene: PackedScene
 @export var reward_spawn_path: NodePath
@@ -57,6 +59,7 @@ func _complete_encounter() -> void:
 		reset_timer.stop()
 	_update_gate_state(true)
 	_spawn_reward_if_needed()
+	encounter_completed.emit()
 
 func _on_reset_timeout() -> void:
 	if _completed:
