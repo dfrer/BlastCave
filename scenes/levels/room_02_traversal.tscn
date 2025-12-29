@@ -1,6 +1,7 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/enemies/basic_enemy.tscn" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/core/damage_source.gd" id="2_damage"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
 albedo_color = Color(0.25, 0.5, 0.3, 1)
@@ -13,6 +14,9 @@ size = Vector3(4, 2, 4)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2"]
 albedo_color = Color(0.15, 0.4, 0.2, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_3"]
+size = Vector3(6, 1, 6)
 
 [node name="Room02Traversal" type="Node3D"]
 
@@ -34,6 +38,13 @@ material = SubResource("StandardMaterial3D_2")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Obstacle/StaticBody3D"]
 shape = SubResource("BoxShape3D_2")
+
+[node name="HazardArea" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.5, 0)
+script = ExtResource("2_damage")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HazardArea"]
+shape = SubResource("BoxShape3D_3")
 
 [node name="Entry" type="Marker3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 10)

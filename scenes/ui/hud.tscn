@@ -22,3 +22,7 @@ layout_mode = 1
 text = "Selected: ImpulseCharge"
 
 [node name="CountsContainer" type="VBoxContainer" parent="Panel/VBox"]
+
+[node name="HealthBar" type="ProgressBar" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 18)
+value = 100.0

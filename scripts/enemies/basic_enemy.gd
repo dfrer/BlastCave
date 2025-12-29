@@ -8,9 +8,12 @@ extends CharacterBody3D
 var blast_response: float = 1.0
 var _stun_timer: float = 0.0
 var _target: Node3D
+@onready var _health_component: HealthComponent = $HealthComponent
 
 func _ready() -> void:
 	_target = get_tree().get_root().find_child("PlayerObject", true, false)
+	if _health_component:
+		_health_component.died.connect(_on_died)
 
 func _physics_process(delta: float) -> void:
 	if not _target:
@@ -38,3 +41,6 @@ func _physics_process(delta: float) -> void:
 func apply_blast_impulse(impulse: Vector3) -> void:
 	velocity += impulse * knockback_multiplier
 	_stun_timer = stun_duration
+
+func _on_died() -> void:
+	queue_free()
