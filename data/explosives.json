@@ -1,0 +1,7 @@
+{
+    "blast_impulse": {
+        "name": "Standard Blast",
+        "force": 15.0,
+        "radius": 5.0
+    }
+}

@@ -1,0 +1,7 @@
+{
+  "standard": {
+    "name": "Explosive Guy",
+    "base_mass": 1.0,
+    "base_friction": 0.5
+  }
+}

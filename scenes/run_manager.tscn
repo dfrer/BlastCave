@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/run_manager.gd" id="1_run_script"]
+
+[node name="RunManager" type="Node"]
+script = ExtResource("1_run_script")

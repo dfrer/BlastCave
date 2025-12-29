@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/explosives/explosive_base.gd" id="1_script"]
+
+[node name="Explosive" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="CSGCylinder3D" type="CSGCylinder3D" parent="."]
+radius = 0.1
+height = 0.4
