@@ -1,0 +1,30 @@
+[
+  {
+    "id": "force_amplifier",
+    "name": "Force Amplifier",
+    "description": "+25% blast force",
+    "effects": {"explosive_force_mult": 1.25},
+    "cost": 8
+  },
+  {
+    "id": "radius_expander",
+    "name": "Radius Expander",
+    "description": "+20% blast radius",
+    "effects": {"explosive_radius_mult": 1.2},
+    "cost": 7
+  },
+  {
+    "id": "quick_charge",
+    "name": "Quick Charge",
+    "description": "-20% ability cooldown",
+    "effects": {"ability_cooldown_mult": 0.8},
+    "cost": 6
+  },
+  {
+    "id": "volatile_mix",
+    "name": "Volatile Mix",
+    "description": "Explosives hit harder and wider",
+    "effects": {"explosive_force_mult": 1.15, "explosive_radius_mult": 1.1},
+    "cost": 10
+  }
+]

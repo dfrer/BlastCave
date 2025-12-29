@@ -2,12 +2,15 @@ extends Node
 class_name PlayerInventory
 
 signal inventory_changed
+signal scrap_changed(new_scrap: int)
 
 var explosives = {
 	"ImpulseCharge": 5,
 	"ShapedCharge": 5,
 	"DelayedCharge": 5
 }
+
+var scrap: int = 0
 
 func get_count(type: String) -> int:
 	return explosives.get(type, 0)
@@ -26,6 +29,21 @@ func add_explosive(type: String, amount: int = 1):
 	if explosives.has(type):
 		explosives[type] += amount
 		inventory_changed.emit()
+
+func add_scrap(amount: int) -> void:
+	if amount <= 0:
+		return
+	scrap += amount
+	scrap_changed.emit(scrap)
+
+func spend_scrap(amount: int) -> bool:
+	if amount <= 0:
+		return false
+	if scrap < amount:
+		return false
+	scrap -= amount
+	scrap_changed.emit(scrap)
+	return true
 
 func get_total_count() -> int:
 	var total = 0
