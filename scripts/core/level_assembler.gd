@@ -69,6 +69,12 @@ func assemble_level() -> void:
 			room.global_position += offset
 		elif entry_marker:
 			room.global_position -= entry_marker.global_position
+			if spawn_marker == null:
+				spawn_marker = entry_marker
+
+		for key in metadata.keys():
+			room.set_meta(key, metadata[key])
+		_attach_room_trigger(room, metadata)
 
 		for key in metadata.keys():
 			room.set_meta(key, metadata[key])
