@@ -17,7 +17,7 @@ func explode():
 	var results = space_state.intersect_shape(query)
 	for result in results:
 		var collider = result.get("collider")
-		if collider is RigidBody3D:
+		if collider:
 			var impulse = calculate_impulse(collider.global_position)
 			if impulse != Vector3.ZERO:
 				var response = 1.0
@@ -26,7 +26,11 @@ func explode():
 				elif collider.has_meta("blast_response"):
 					response = collider.get_meta("blast_response")
 				
-				collider.apply_central_impulse(impulse * response)
+				var final_impulse = impulse * response
+				if collider is RigidBody3D:
+					collider.apply_central_impulse(final_impulse)
+				elif collider.has_method("apply_blast_impulse"):
+					collider.apply_blast_impulse(final_impulse)
 
 # Virtual method to be overridden by subclasses
 func calculate_impulse(target_pos: Vector3) -> Vector3:
