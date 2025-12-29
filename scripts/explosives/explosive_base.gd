@@ -20,7 +20,13 @@ func explode():
 		if collider is RigidBody3D:
 			var impulse = calculate_impulse(collider.global_position)
 			if impulse != Vector3.ZERO:
-				collider.apply_central_impulse(impulse)
+				var response = 1.0
+				if "blast_response" in collider:
+					response = collider.blast_response
+				elif collider.has_meta("blast_response"):
+					response = collider.get_meta("blast_response")
+				
+				collider.apply_central_impulse(impulse * response)
 
 # Virtual method to be overridden by subclasses
 func calculate_impulse(target_pos: Vector3) -> Vector3:

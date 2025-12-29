@@ -1,7 +1,47 @@
 {
-  "standard": {
-    "name": "Explosive Guy",
-    "base_mass": 1.0,
-    "base_friction": 0.5
+  "core": {
+    "display_name": "Core Prototype",
+    "mass": 1.0,
+    "friction": 0.5,
+    "linear_damp": 0.1,
+    "angular_damp": 0.1,
+    "blast_response": 1.0,
+    "ability": "none"
+  },
+  "slug": {
+    "display_name": "Heavy Slug",
+    "mass": 3.0,
+    "friction": 0.8,
+    "linear_damp": 0.5,
+    "angular_damp": 0.5,
+    "blast_response": 0.6,
+    "ability": "none"
+  },
+  "shard": {
+    "display_name": "Fragile Shard",
+    "mass": 0.4,
+    "friction": 0.2,
+    "linear_damp": 0.0,
+    "angular_damp": 0.0,
+    "blast_response": 1.5,
+    "ability": "none"
+  },
+  "anchor": {
+    "display_name": "Iron Anchor",
+    "mass": 2.0,
+    "friction": 0.6,
+    "linear_damp": 0.2,
+    "angular_damp": 0.2,
+    "blast_response": 0.8,
+    "ability": "anchor_pin"
+  },
+  "gyro": {
+    "display_name": "Gyro Stabilizer",
+    "mass": 1.0,
+    "friction": 0.5,
+    "linear_damp": 0.1,
+    "angular_damp": 0.1,
+    "blast_response": 1.0,
+    "ability": "gyro_stabilize"
   }
 }

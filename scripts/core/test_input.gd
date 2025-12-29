@@ -43,14 +43,18 @@ func _input(event):
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			spawn_blast_at_mouse()
 		elif event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
-			current_type_index = (current_type_index + 1) % explosive_types.size()
+			_cycle_inventory(1)
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
-			current_type_index = (current_type_index - 1 + explosive_types.size()) % explosive_types.size()
+			_cycle_inventory(-1)
 	
 	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_1: current_type_index = 0
-		if event.keycode == KEY_2: current_type_index = 1
-		if event.keycode == KEY_3: current_type_index = 2
+		# Use Q and E to cycle inventory to avoid conflict with character selection (1-5)
+		if event.keycode == KEY_E: _cycle_inventory(1)
+		if event.keycode == KEY_Q: _cycle_inventory(-1)
+
+func _cycle_inventory(dir: int):
+	current_type_index = (current_type_index + dir + explosive_types.size()) % explosive_types.size()
+	print("Selected Explosive: ", explosive_types[current_type_index])
 
 func spawn_blast_at_mouse():
 	var type = explosive_types[current_type_index]
@@ -66,18 +70,11 @@ func spawn_blast_at_mouse():
 		add_child(blast)
 		blast.global_position = ray_hit
 		
-		# For ShapedCharge, we should orient it. 
-		# For now, let's orient it towards the player or up.
-		# A better way would be the surface normal, but let's stick to basics.
 		if blast is ShapedCharge:
 			if ray_hit.distance_to(player_obj.global_position) > 0.001:
 				blast.look_at(player_obj.global_position)
 			
 		blast.trigger()
-		if not blast is DelayedCharge:
-			# Non-delayed charges might not queue_free themselves if we call trigger manually 
-			# but our updated scripts DO call queue_free in trigger or timeout.
-			pass
 
 func _get_ray_hit(mouse_pos: Vector2) -> Vector3:
 	var camera = get_viewport().get_camera_3d()
@@ -98,10 +95,9 @@ func _update_trajectory_preview(blast_pos: Vector3):
 	var type = explosive_types[current_type_index]
 	var script = explosive_scripts[type]
 	
-	# Create a dummy instance to calculate impulse without spawning
 	var temp_blast = script.new() as ExplosiveBase
 	temp_blast.is_preview = true
-	add_child(temp_blast) # Node MUST be in tree for global_transform and look_at
+	add_child(temp_blast)
 	temp_blast.global_position = blast_pos
 	
 	if temp_blast is ShapedCharge:
@@ -110,7 +106,7 @@ func _update_trajectory_preview(blast_pos: Vector3):
 	
 	var impulse = temp_blast.calculate_impulse(player_obj.global_position)
 	remove_child(temp_blast)
-	temp_blast.free() # Clean up immediately
+	temp_blast.free()
 	
 	if impulse.length() > 0.01:
 		var initial_velocity = player_obj.linear_velocity + (impulse / player_obj.mass)
@@ -121,17 +117,10 @@ func _update_trajectory_preview(blast_pos: Vector3):
 
 func _check_stuck_condition():
 	if not player_obj: return
-	
-	# If player is nearly stopped and out of explosives, reset
 	if player_obj.linear_velocity.length() < 0.1 and inventory.get_total_count() == 0:
-		# Small delay or check if any explosives are still in scene?
-		# Requirements say: "When object is stuck and inventory = 0 -> reset"
 		reset_object()
 
 func reset_object():
 	player_obj.linear_velocity = Vector3.ZERO
 	player_obj.angular_velocity = Vector3.ZERO
 	player_obj.global_position = player_spawn_pos
-	# Refill inventory? Requirements didn't say, but it helps testing.
-	# "Implement reset to start of stage if player runs out of explosives and object gets stuck"
-	# I'll just reset the position.
