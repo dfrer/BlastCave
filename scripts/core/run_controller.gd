@@ -8,6 +8,7 @@ var trajectory_node: TrajectoryPreview
 var player_obj: RigidBody3D
 var inventory: PlayerInventory
 var hud: HUD
+var debug_overlay: DebugOverlay
 
 var explosive_types = ["ImpulseCharge", "ShapedCharge", "DelayedCharge"]
 var current_type_index = 0
@@ -25,6 +26,7 @@ func _ready():
 		player_spawn_pos = player_obj.global_position
 
 	hud = get_node_or_null(hud_path) as HUD
+	debug_overlay = get_node_or_null("DebugOverlay") as DebugOverlay
 
 	trajectory_node = TrajectoryPreview.new()
 	add_child(trajectory_node)
@@ -51,6 +53,9 @@ func _process(_delta):
 	_check_stuck_condition()
 
 func _input(event):
+	if event is InputEventKey and event.pressed and event.keycode == KEY_F3:
+		_toggle_debug_overlay()
+		return
 	if not _is_running():
 		return
 	if event is InputEventMouseButton:
@@ -67,6 +72,10 @@ func _input(event):
 			_cycle_inventory(1)
 		if event.keycode == KEY_Q:
 			_cycle_inventory(-1)
+
+func _toggle_debug_overlay() -> void:
+	if debug_overlay:
+		debug_overlay.visible = not debug_overlay.visible
 
 func _cycle_inventory(dir: int):
 	current_type_index = (current_type_index + dir + explosive_types.size()) % explosive_types.size()
@@ -152,6 +161,11 @@ func _update_hud():
 		return
 	hud.set_selected_type(explosive_types[current_type_index])
 	hud.set_counts(inventory.explosives)
+
+func get_current_explosive_type() -> String:
+	if explosive_types.is_empty():
+		return ""
+	return explosive_types[current_type_index]
 
 func _is_running() -> bool:
 	return game_flow != null and game_flow.is_running()

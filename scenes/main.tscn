@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/run_manager.tscn" id="1_run"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_root.tscn" id="2_level_root"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://scripts/core/run_start.gd" id="5_run_start"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="6_hud"]
 [ext_resource type="PackedScene" path="res://scenes/ui/pause_menu.tscn" id="7_pause"]
+[ext_resource type="PackedScene" path="res://scenes/ui/debug_overlay.tscn" id="8_debug"]
 
 [node name="Main" type="Node3D"]
 script = ExtResource("4_controller")
@@ -30,6 +31,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 10)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
 
 [node name="HUD" parent="." instance=ExtResource("6_hud")]
+
+[node name="DebugOverlay" parent="." instance=ExtResource("8_debug")]
 
 [node name="PauseMenu" parent="." instance=ExtResource("7_pause")]
 
