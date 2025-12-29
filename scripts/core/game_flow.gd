@@ -1,5 +1,5 @@
 extends Node
-class_name GameState
+class_name GameFlow
 
 signal state_changed(new_state: int, previous_state: int)
 
