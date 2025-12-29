@@ -1,7 +1,7 @@
 extends Area3D
 class_name RoomTrigger
 
-@export var room_tags: Array[String] = []
+@export var room_tags: PackedStringArray = []
 @export var room_type: int = -1
 
 func _ready() -> void:

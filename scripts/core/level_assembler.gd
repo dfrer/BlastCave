@@ -94,8 +94,8 @@ func _attach_room_trigger(room: Node3D, metadata: Dictionary) -> void:
 	var tags: Array = metadata.get("tags", [])
 	if tags.is_empty():
 		return
-	var trigger = RoomTrigger.new()
-	trigger.room_tags = tags
+	var trigger := RoomTrigger.new() as RoomTrigger
+	trigger.room_tags = PackedStringArray(tags)
 	trigger.room_type = metadata.get("room_type", -1)
 	var shape = CollisionShape3D.new()
 	var box = BoxShape3D.new()

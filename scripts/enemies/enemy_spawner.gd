@@ -16,6 +16,9 @@ func _ready() -> void:
 	_timer.one_shot = false
 	add_child(_timer)
 	_timer.timeout.connect(_on_timeout)
+	call_deferred("_start_spawning")
+
+func _start_spawning() -> void:
 	for _i in range(initial_burst):
 		_spawn_enemy()
 	_timer.start()
@@ -24,6 +27,8 @@ func _on_timeout() -> void:
 	_spawn_enemy()
 
 func _spawn_enemy() -> void:
+	if not is_inside_tree():
+		return
 	_cleanup_spawned()
 	if _spawned.size() >= max_alive:
 		return
@@ -38,9 +43,11 @@ func _spawn_enemy() -> void:
 	var spawn_pos = global_position
 	var point = _pick_spawn_point()
 	if point:
-		spawn_pos = point.global_position
+		if point.is_inside_tree():
+			spawn_pos = point.global_position
 	instance.global_position = spawn_pos
-	get_parent().add_child(instance)
+	if get_parent():
+		get_parent().add_child.call_deferred(instance)
 	_spawned.append(instance)
 
 func _cleanup_spawned() -> void:

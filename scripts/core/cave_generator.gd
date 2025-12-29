@@ -4,7 +4,7 @@ class_name CaveGenerator
 enum MetaTag { NONE, NO_RETURN, COSTLY_RETURN }
 enum RoomType { START, COMBAT, PUZZLE, SHOP, REWARD, BOSS, EXIT }
 
-@export var seed: int = 1337
+@export var generation_seed: int = 1337
 @export var main_depth: int = 6
 @export var branch_chance: float = 0.35
 @export var branch_depth_min: int = 1
@@ -20,7 +20,7 @@ enum RoomType { START, COMBAT, PUZZLE, SHOP, REWARD, BOSS, EXIT }
 
 func generate_cave() -> Array:
 	var rng = RandomNumberGenerator.new()
-	rng.seed = seed
+	rng.seed = generation_seed
 
 	var rooms: Array = []
 	var id_counter := 0
