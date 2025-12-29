@@ -3,6 +3,7 @@ class_name ExplosiveBase
 
 @export var blast_force: float = 10.0
 @export var blast_radius: float = 5.0
+@export var explosive_type: String = "ImpulseCharge"
 
 var is_preview: bool = false
 
@@ -30,8 +31,13 @@ func explode():
 				var final_impulse = impulse * response
 				if collider is RigidBody3D:
 					collider.apply_central_impulse(final_impulse)
+				elif collider.has_method("apply_blast_impulse_with_type"):
+					collider.apply_blast_impulse_with_type(final_impulse, explosive_type)
 				elif collider.has_method("apply_blast_impulse"):
 					collider.apply_blast_impulse(final_impulse)
+
+	FXHelper.spawn_burst(get_parent(), global_position, Color(1.0, 0.7, 0.2))
+	FXHelper.spawn_sfx(get_parent(), global_position, 1.2)
 
 # Virtual method to be overridden by subclasses
 func calculate_impulse(target_pos: Vector3) -> Vector3:

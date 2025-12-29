@@ -27,5 +27,11 @@ text = "Explosive:"
 [node name="RoomLabel" type="Label" parent="Panel/VBox"]
 text = "Room:"
 
+[node name="ScrapLabel" type="Label" parent="Panel/VBox"]
+text = "Scrap:"
+
+[node name="StateLabel" type="Label" parent="Panel/VBox"]
+text = "State:"
+
 [node name="FpsLabel" type="Label" parent="Panel/VBox"]
 text = "FPS:"

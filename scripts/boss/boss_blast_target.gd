@@ -6,6 +6,8 @@ signal reset(target: BossBlastTarget)
 
 @export var is_active: bool = false
 @export var required_impulse: float = 0.0
+@export var required_explosive_type: String = ""
+@export var phase_index: int = 0
 @export var active_color: Color = Color(0.2, 1.0, 0.3)
 @export var inactive_color: Color = Color(1.0, 0.2, 0.2)
 @export var active_energy: float = 2.5
@@ -21,6 +23,11 @@ func apply_blast_impulse(impulse: Vector3) -> void:
 	if required_impulse > 0.0 and impulse.length() < required_impulse:
 		return
 	set_active(true)
+
+func apply_blast_impulse_with_type(impulse: Vector3, explosive_type: String) -> void:
+	if required_explosive_type != "" and explosive_type != required_explosive_type:
+		return
+	apply_blast_impulse(impulse)
 
 func set_active(active: bool) -> void:
 	if is_active == active:
