@@ -14,6 +14,6 @@ func generate_cave() -> Array[PackedScene]:
 	# Linear placeholder generation until procedural stitching is ready.
 	return room_scenes.duplicate()
 
-func stitch_chunk(chunk_scene: PackedScene, tags: Array[MetaTag]):
+func stitch_chunk(_chunk_scene: PackedScene, _tags: Array[MetaTag]):
 	# Logic for adding a chunk based on metadata
 	pass
