@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/run_manager.tscn" id="1_run"]
-[ext_resource type="PackedScene" path="res://scenes/test_arena.tscn" id="2_arena"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_root.tscn" id="2_level_root"]
 [ext_resource type="PackedScene" path="res://scenes/player_object.tscn" id="3_player"]
 [ext_resource type="Script" path="res://scripts/core/run_controller.gd" id="4_controller"]
 [ext_resource type="Script" path="res://scripts/core/run_start.gd" id="5_run_start"]
@@ -21,9 +21,9 @@ shadow_enabled = true
 script = ExtResource("5_run_start")
 
 [node name="SpawnPoint" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 10)
 
-[node name="TestArena" parent="." instance=ExtResource("2_arena")]
+[node name="LevelRoot" parent="." instance=ExtResource("2_level_root")]
 
 [node name="PlayerObject" parent="." instance=ExtResource("3_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
