@@ -1,11 +1,20 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/levels/room_01_intro.tscn" id="1_intro"]
 [ext_resource type="PackedScene" path="res://scenes/levels/room_02_traversal.tscn" id="2_traversal"]
 [ext_resource type="PackedScene" path="res://scenes/levels/room_03_exit.tscn" id="3_exit"]
 [ext_resource type="PackedScene" path="res://scenes/levels/room_04_boss.tscn" id="4_boss"]
+[ext_resource type="Script" path="res://scripts/core/level_assembler.gd" id="5_level_assembler"]
+[ext_resource type="Script" path="res://scripts/core/cave_generator.gd" id="6_cave_generator"]
 
 [node name="LevelRoot" type="Node3D"]
+
+[node name="LevelAssembler" type="Node3D" parent="."]
+script = ExtResource("5_level_assembler")
+use_generator = false
+
+[node name="CaveGenerator" type="Node" parent="LevelAssembler"]
+script = ExtResource("6_cave_generator")
 
 [node name="Room01Intro" parent="." instance=ExtResource("1_intro")]
 
