@@ -30,7 +30,7 @@ func end_run():
 	if roguelike_state:
 		roguelike_state.end_run()
 	print("Run ended.")
-	GameState.set_state(GameState.State.SUMMARY)
+	GameFlow.set_state(GameFlow.State.SUMMARY)
 	_return_to_main_menu()
 
 func register_upgrade(upgrade_data: Dictionary) -> void:

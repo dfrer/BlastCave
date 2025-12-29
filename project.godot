@@ -16,7 +16,7 @@ config/features=PackedStringArray("4.5", "Forward Plus")
 
 [autoload]
 
-GameState="res://scripts/core/game_flow.gd"
+GameFlow="res://scripts/core/game_flow.gd"
 
 [input]
 

@@ -153,4 +153,4 @@ func _update_hud():
 	hud.set_counts(inventory.explosives)
 
 func _is_running() -> bool:
-	return GameState.is_running()
+	return GameFlow.is_running()
