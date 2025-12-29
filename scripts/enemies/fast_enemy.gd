@@ -1,17 +1,18 @@
 extends CharacterBody3D
+class_name FastEnemy
 
 enum State { IDLE, ALERT, ATTACK }
 
-@export var move_speed: float = 3.5
-@export var acceleration: float = 10.0
-@export var knockback_multiplier: float = 1.0
-@export var stun_duration: float = 1.0
-@export var detection_range: float = 12.0
-@export var attack_range: float = 2.5
-@export var attack_cooldown: float = 1.3
-@export var attack_damage: int = 8
+@export var move_speed: float = 5.5
+@export var acceleration: float = 14.0
+@export var knockback_multiplier: float = 1.2
+@export var stun_duration: float = 0.8
+@export var detection_range: float = 14.0
+@export var attack_range: float = 2.0
+@export var attack_cooldown: float = 0.9
+@export var attack_damage: int = 6
 
-var blast_response: float = 1.0
+var blast_response: float = 1.1
 var _stun_timer: float = 0.0
 var _target: Node3D
 var _state: int = State.IDLE
@@ -87,7 +88,7 @@ func _try_attack() -> void:
 	_attack_timer = attack_cooldown
 	if _damage_source:
 		_damage_source.monitoring = true
-		get_tree().create_timer(0.2).timeout.connect(_disable_damage_source)
+		get_tree().create_timer(0.15).timeout.connect(_disable_damage_source)
 
 func _disable_damage_source() -> void:
 	if _damage_source:

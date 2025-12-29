@@ -3,6 +3,7 @@ class_name PauseMenu
 
 @onready var resume_button: Button = $Panel/MarginContainer/VBox/ResumeButton
 @onready var quit_button: Button = $Panel/MarginContainer/VBox/QuitButton
+@onready var camera_settings_button: Button = $Panel/MarginContainer/VBox/CameraSettingsButton
 
 @export var main_menu_scene: String = "res://scenes/ui/main_menu.tscn"
 
@@ -13,6 +14,8 @@ func _ready() -> void:
 		resume_button.pressed.connect(_on_resume_pressed)
 	if quit_button:
 		quit_button.pressed.connect(_on_quit_pressed)
+	if camera_settings_button:
+		camera_settings_button.pressed.connect(_on_camera_settings_pressed)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
@@ -40,3 +43,8 @@ func _on_quit_pressed() -> void:
 	visible = false
 	if main_menu_scene != "":
 		get_tree().change_scene_to_file(main_menu_scene)
+
+func _on_camera_settings_pressed() -> void:
+	var settings = get_tree().get_root().find_child("CameraSettings", true, false)
+	if settings and settings.has_method("toggle"):
+		settings.toggle()

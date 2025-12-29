@@ -4,6 +4,8 @@ class_name DebugOverlay
 @onready var run_id_label: Label = $Panel/VBox/RunIdLabel
 @onready var explosive_label: Label = $Panel/VBox/ExplosiveLabel
 @onready var room_label: Label = $Panel/VBox/RoomLabel
+@onready var scrap_label: Label = $Panel/VBox/ScrapLabel
+@onready var state_label: Label = $Panel/VBox/StateLabel
 @onready var fps_label: Label = $Panel/VBox/FpsLabel
 
 var _run_manager: RunManager
@@ -49,6 +51,12 @@ func _update_labels() -> void:
 		if _roguelike_state:
 			room_index_text = str(_roguelike_state.current_depth)
 		room_label.text = "Room: %s" % room_index_text
+
+	if scrap_label and _roguelike_state:
+		scrap_label.text = "Scrap: %d" % _roguelike_state.run_scrap
+
+	if state_label and _run_manager and _run_manager.game_flow:
+		state_label.text = "State: %s" % str(_run_manager.game_flow.current_state)
 
 	if fps_label:
 		fps_label.text = "FPS: %d" % Engine.get_frames_per_second()

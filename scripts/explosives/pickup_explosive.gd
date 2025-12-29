@@ -2,6 +2,7 @@ extends Area3D
 
 @export_enum("ImpulseCharge", "ShapedCharge", "DelayedCharge") var explosive_type: String = "ImpulseCharge"
 @export var amount: int = 1
+@export var scrap_value: int = 2
 
 func _ready():
 	body_entered.connect(_on_body_entered)
@@ -16,8 +17,14 @@ func _on_body_entered(body: Node3D):
 	if body is RigidBody3D and body.name == "PlayerObject":
 		var root = get_tree().current_scene
 		var inventory_node = root.find_child("PlayerInventory", true, false)
+		var roguelike_state = root.find_child("RoguelikeState", true, false) as RoguelikeState
 		if inventory_node and inventory_node is PlayerInventory:
 			inventory_node.add_explosive(explosive_type, amount)
+			inventory_node.add_scrap(scrap_value)
+			if roguelike_state:
+				roguelike_state.add_scrap(scrap_value)
+			FXHelper.spawn_burst(get_parent(), global_position, Color(0.4, 0.9, 1.0))
+			FXHelper.spawn_sfx(get_parent(), global_position, 1.5)
 			queue_free()
 		else:
 			# Fallback: check if the parent of player_object or similar has it

@@ -9,6 +9,8 @@ var player_obj: RigidBody3D
 var inventory: PlayerInventory
 var hud: HUD
 var debug_overlay: DebugOverlay
+var _camera_settings: CameraSettingsState
+var _roguelike_state: RoguelikeState
 
 var explosive_types = ["ImpulseCharge", "ShapedCharge", "DelayedCharge"]
 var current_type_index = 0
@@ -34,9 +36,19 @@ func _ready():
 	inventory = PlayerInventory.new()
 	inventory.name = "PlayerInventory"
 	inventory.inventory_changed.connect(_on_inventory_changed)
+	inventory.scrap_changed.connect(_on_scrap_changed)
 	add_child(inventory)
 
+	_roguelike_state = get_tree().get_root().find_child("RoguelikeState", true, false) as RoguelikeState
+	if _roguelike_state:
+		_roguelike_state.scrap_changed.connect(_sync_scrap_to_inventory)
+
+	_camera_settings = get_tree().get_root().find_child("CameraSettingsState", true, false) as CameraSettingsState
+	if _camera_settings:
+		_camera_settings.settings_changed.connect(_update_input_hints)
+
 	_update_hud()
+	_update_input_hints()
 
 func _process(_delta):
 	if not _is_running():
@@ -93,6 +105,7 @@ func spawn_blast_at_mouse():
 		inventory.use_explosive(type)
 		var script = explosive_scripts[type]
 		var blast = script.new() as ExplosiveBase
+		_apply_explosive_upgrades(blast)
 		add_child(blast)
 		blast.global_position = ray_hit
 
@@ -123,6 +136,7 @@ func _update_trajectory_preview(blast_pos: Vector3):
 	var script = explosive_scripts[type]
 
 	var temp_blast = script.new() as ExplosiveBase
+	_apply_explosive_upgrades(temp_blast)
 	temp_blast.is_preview = true
 	add_child(temp_blast)
 	temp_blast.global_position = blast_pos
@@ -156,11 +170,33 @@ func reset_object():
 func _on_inventory_changed():
 	_update_hud()
 
+func _on_scrap_changed(_amount: int) -> void:
+	_update_hud()
+
 func _update_hud():
 	if not hud:
 		return
 	hud.set_selected_type(explosive_types[current_type_index])
 	hud.set_counts(inventory.explosives)
+	hud.set_scrap(inventory.scrap)
+
+func _update_input_hints() -> void:
+	if not hud:
+		return
+	var hint_text = ""
+	if not _camera_settings or _camera_settings.show_input_hints:
+		hint_text = "LMB: Place explosive | Q/E: Cycle | RMB drag: Orbit | Wheel: Zoom | F: Ability"
+	hud.set_input_hints(hint_text)
+
+func _apply_explosive_upgrades(blast: ExplosiveBase) -> void:
+	if not blast or not _roguelike_state:
+		return
+	blast.blast_force *= _roguelike_state.explosive_force_mult
+	blast.blast_radius *= _roguelike_state.explosive_radius_mult
+
+func _sync_scrap_to_inventory(run_scrap: int, _meta_scrap: int) -> void:
+	inventory.scrap = run_scrap
+	inventory.scrap_changed.emit(run_scrap)
 
 func get_current_explosive_type() -> String:
 	if explosive_types.is_empty():

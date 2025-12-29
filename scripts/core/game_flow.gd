@@ -6,6 +6,7 @@ enum State {
 	MENU,
 	RUNNING,
 	SUMMARY,
+	META,
 }
 
 var current_state: int = State.MENU

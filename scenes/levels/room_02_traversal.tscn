@@ -1,12 +1,15 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/enemies/basic_enemy.tscn" id="1_enemy"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/fast_enemy.tscn" id="2_fast_enemy"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/ranged_enemy.tscn" id="3_ranged_enemy"]
 [ext_resource type="Script" path="res://scripts/core/damage_source.gd" id="2_damage"]
 [ext_resource type="Script" path="res://scripts/puzzles/blast_switch.gd" id="3_switch"]
 [ext_resource type="PackedScene" path="res://scenes/puzzles/gate.tscn" id="4_gate"]
 [ext_resource type="PackedScene" path="res://scenes/kit/cave_floor.tscn" id="5_floor"]
 [ext_resource type="PackedScene" path="res://scenes/kit/cave_wall.tscn" id="6_wall"]
 [ext_resource type="PackedScene" path="res://scenes/kit/cave_column.tscn" id="7_column"]
+[ext_resource type="Script" path="res://scripts/enemies/enemy_spawner.gd" id="8_spawner"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_3"]
 size = Vector3(6, 1, 6)
@@ -64,11 +67,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 10)
 [node name="Exit" type="Marker3D" parent="." groups=["chunk_exit"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -10)
 
-[node name="BasicEnemy" parent="." instance=ExtResource("1_enemy")]
+[node name="SpawnPointA" type="Marker3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 1, 0)
 
-[node name="BasicEnemy2" parent="." instance=ExtResource("1_enemy")]
+[node name="SpawnPointB" type="Marker3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 1, -4)
+
+[node name="EnemySpawner" type="Node3D" parent="."]
+script = ExtResource("8_spawner")
+spawn_scenes = Array[PackedScene]([ExtResource("1_enemy"), ExtResource("2_fast_enemy"), ExtResource("3_ranged_enemy")])
+spawn_points = Array[NodePath]([NodePath("../SpawnPointA"), NodePath("../SpawnPointB")])
+max_alive = 4
+spawn_interval = 4.0
+initial_burst = 2
 
 [node name="Gate" parent="." instance=ExtResource("4_gate")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6)
