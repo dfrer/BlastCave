@@ -63,4 +63,4 @@ func _on_health_changed(current_health: int, max_health: int) -> void:
 	health_bar.tooltip_text = "Health: %d/%d" % [current_health, max_health]
 
 func _on_player_died() -> void:
-	_on_health_changed(0, health_bar.max_value)
+	_on_health_changed(0, int(health_bar.max_value))
