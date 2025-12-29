@@ -60,10 +60,10 @@ script = ExtResource("2_damage")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="HazardArea"]
 shape = SubResource("BoxShape3D_3")
 
-[node name="Entry" type="Marker3D" parent="."]
+[node name="Entry" type="Marker3D" parent="." groups=["chunk_entry"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 10)
 
-[node name="Exit" type="Marker3D" parent="."]
+[node name="Exit" type="Marker3D" parent="." groups=["chunk_exit"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -10)
 
 [node name="BasicEnemy" parent="." instance=ExtResource("1_enemy")]
