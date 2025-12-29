@@ -1,0 +1,67 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/camera_settings.gd" id="1_camera_settings"]
+
+[node name="CameraSettings" type="CanvasLayer"]
+script = ExtResource("1_camera_settings")
+
+[node name="Panel" type="PanelContainer" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -220.0
+offset_right = 220.0
+offset_bottom = 220.0
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel"]
+custom_minimum_size = Vector2(420, 400)
+
+[node name="VBox" type="VBoxContainer" parent="Panel/MarginContainer"]
+
+[node name="TitleLabel" type="Label" parent="Panel/MarginContainer/VBox"]
+text = "Camera Settings"
+
+[node name="OrbitLabel" type="Label" parent="Panel/MarginContainer/VBox"]
+text = "Orbit Sensitivity"
+
+[node name="OrbitSensitivity" type="HSlider" parent="Panel/MarginContainer/VBox"]
+min_value = 0.005
+max_value = 0.05
+step = 0.001
+value = 0.015
+
+[node name="ZoomLabel" type="Label" parent="Panel/MarginContainer/VBox"]
+text = "Zoom Speed"
+
+[node name="ZoomSpeed" type="HSlider" parent="Panel/MarginContainer/VBox"]
+min_value = 0.5
+max_value = 6.0
+step = 0.1
+value = 2.0
+
+[node name="MinLabel" type="Label" parent="Panel/MarginContainer/VBox"]
+text = "Min Distance"
+
+[node name="MinDistance" type="HSlider" parent="Panel/MarginContainer/VBox"]
+min_value = 4.0
+max_value = 12.0
+step = 0.5
+value = 6.0
+
+[node name="MaxLabel" type="Label" parent="Panel/MarginContainer/VBox"]
+text = "Max Distance"
+
+[node name="MaxDistance" type="HSlider" parent="Panel/MarginContainer/VBox"]
+min_value = 12.0
+max_value = 30.0
+step = 0.5
+value = 22.0
+
+[node name="HintsToggle" type="CheckBox" parent="Panel/MarginContainer/VBox"]
+text = "Show Input Hints"
+button_pressed = true
+
+[node name="CloseButton" type="Button" parent="Panel/MarginContainer/VBox"]
+text = "Close"

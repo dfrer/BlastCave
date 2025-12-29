@@ -4,6 +4,7 @@ class_name DelayedCharge
 @export var delay_seconds: float = 2.0
 
 func _ready():
+	explosive_type = "DelayedCharge"
 	if is_preview: return
 	get_tree().create_timer(delay_seconds).timeout.connect(_on_timeout)
 

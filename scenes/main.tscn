@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/run_manager.tscn" id="1_run"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_root.tscn" id="2_level_root"]
@@ -8,6 +8,9 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="6_hud"]
 [ext_resource type="PackedScene" path="res://scenes/ui/pause_menu.tscn" id="7_pause"]
 [ext_resource type="PackedScene" path="res://scenes/ui/debug_overlay.tscn" id="8_debug"]
+[ext_resource type="Script" path="res://scripts/core/camera_rig.gd" id="9_camera_rig"]
+[ext_resource type="Script" path="res://scripts/ui/camera_settings_state.gd" id="10_camera_settings_state"]
+[ext_resource type="PackedScene" path="res://scenes/ui/camera_settings.tscn" id="11_camera_settings"]
 
 [node name="Main" type="Node3D"]
 script = ExtResource("4_controller")
@@ -36,6 +39,16 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
 
 [node name="PauseMenu" parent="." instance=ExtResource("7_pause")]
 
-[node name="Camera3D" type="Camera3D" parent="."]
+[node name="CameraSettingsState" type="Node" parent="."]
+script = ExtResource("10_camera_settings_state")
+
+[node name="CameraSettings" parent="." instance=ExtResource("11_camera_settings")]
+
+[node name="CameraRig" type="Node3D" parent="."]
+script = ExtResource("9_camera_rig")
+
+[node name="Pivot" type="Node3D" parent="CameraRig"]
+
+[node name="Camera3D" type="Camera3D" parent="CameraRig/Pivot"]
 transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 10, 15)
 far = 500.0

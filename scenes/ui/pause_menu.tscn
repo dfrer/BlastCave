@@ -28,3 +28,6 @@ text = "Resume"
 
 [node name="QuitButton" type="Button" parent="Panel/MarginContainer/VBox"]
 text = "Quit to Menu"
+
+[node name="CameraSettingsButton" type="Button" parent="Panel/MarginContainer/VBox"]
+text = "Camera Settings"

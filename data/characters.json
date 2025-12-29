@@ -6,7 +6,13 @@
     "linear_damp": 0.1,
     "angular_damp": 0.1,
     "blast_response": 1.0,
-    "ability": "none"
+    "ability": "none",
+    "ability_config": {
+      "label": "No Ability",
+      "cooldown": 0.0,
+      "duration": 0.0,
+      "power": 1.0
+    }
   },
   "slug": {
     "display_name": "Heavy Slug",
@@ -15,7 +21,13 @@
     "linear_damp": 0.5,
     "angular_damp": 0.5,
     "blast_response": 0.6,
-    "ability": "none"
+    "ability": "none",
+    "ability_config": {
+      "label": "No Ability",
+      "cooldown": 0.0,
+      "duration": 0.0,
+      "power": 1.0
+    }
   },
   "shard": {
     "display_name": "Fragile Shard",
@@ -24,7 +36,13 @@
     "linear_damp": 0.0,
     "angular_damp": 0.0,
     "blast_response": 1.5,
-    "ability": "none"
+    "ability": "none",
+    "ability_config": {
+      "label": "No Ability",
+      "cooldown": 0.0,
+      "duration": 0.0,
+      "power": 1.0
+    }
   },
   "anchor": {
     "display_name": "Iron Anchor",
@@ -33,7 +51,13 @@
     "linear_damp": 0.2,
     "angular_damp": 0.2,
     "blast_response": 0.8,
-    "ability": "anchor_pin"
+    "ability": "anchor_pin",
+    "ability_config": {
+      "label": "Anchor Pin",
+      "cooldown": 6.0,
+      "duration": 2.5,
+      "power": 1.0
+    }
   },
   "gyro": {
     "display_name": "Gyro Stabilizer",
@@ -42,6 +66,12 @@
     "linear_damp": 0.1,
     "angular_damp": 0.1,
     "blast_response": 1.0,
-    "ability": "gyro_stabilize"
+    "ability": "gyro_stabilize",
+    "ability_config": {
+      "label": "Gyro Stabilize",
+      "cooldown": 4.5,
+      "duration": 1.5,
+      "power": 1.2
+    }
   }
 }
