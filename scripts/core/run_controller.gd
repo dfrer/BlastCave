@@ -11,6 +11,7 @@ var hud: HUD
 
 var explosive_types = ["ImpulseCharge", "ShapedCharge", "DelayedCharge"]
 var current_type_index = 0
+@onready var game_flow = get_node("/root/GameFlow")
 
 var explosive_scripts = {
 	"ImpulseCharge": preload("res://scripts/explosives/impulse_charge.gd"),
@@ -153,4 +154,4 @@ func _update_hud():
 	hud.set_counts(inventory.explosives)
 
 func _is_running() -> bool:
-	return GameFlow.is_running()
+	return game_flow != null and game_flow.is_running()

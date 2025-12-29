@@ -6,6 +6,7 @@ var is_active: bool = false
 var _player_health: HealthComponent
 var roguelike_state: RoguelikeState
 var _run_summary: RunSummary
+@onready var game_flow = get_node("/root/GameFlow")
 
 @export var run_summary_scene: PackedScene = preload("res://scenes/ui/run_summary.tscn")
 @export var main_menu_scene: String = "res://scenes/ui/main_menu.tscn"
@@ -30,7 +31,8 @@ func end_run():
 	if roguelike_state:
 		roguelike_state.end_run()
 	print("Run ended.")
-	GameFlow.set_state(GameFlow.State.SUMMARY)
+	if game_flow:
+		game_flow.set_state(game_flow.State.SUMMARY)
 	_return_to_main_menu()
 
 func register_upgrade(upgrade_data: Dictionary) -> void:
