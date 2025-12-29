@@ -1,8 +1,8 @@
 extends CanvasLayer
 class_name HUD
 
-@onready var selected_label: Label = %SelectedTypeLabel
-@onready var counts_container: VBoxContainer = %CountsContainer
+@onready var selected_label: Label = $Panel/VBox/SelectedTypeLabel
+@onready var counts_container: VBoxContainer = $Panel/VBox/CountsContainer
 
 func set_selected_type(type_name: String) -> void:
 	if selected_label:
