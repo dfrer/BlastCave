@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/levels/room_01_intro.tscn" id="1_intro"]
 [ext_resource type="PackedScene" path="res://scenes/levels/room_02_traversal.tscn" id="2_traversal"]
 [ext_resource type="PackedScene" path="res://scenes/levels/room_03_exit.tscn" id="3_exit"]
+[ext_resource type="PackedScene" path="res://scenes/levels/room_04_boss.tscn" id="4_boss"]
 
 [node name="LevelRoot" type="Node3D"]
 
@@ -13,3 +14,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -20)
 
 [node name="Room03Exit" parent="." instance=ExtResource("3_exit")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -40)
+
+[node name="Room04Boss" parent="." instance=ExtResource("4_boss")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -60)
