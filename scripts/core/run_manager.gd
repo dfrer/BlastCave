@@ -6,14 +6,24 @@ var is_active: bool = false
 var _player_health: HealthComponent
 var roguelike_state: RoguelikeState
 var _run_summary: RunSummary
+var _reward_selection: RewardSelection
+var _shop_menu: ShopMenu
+var _meta_menu: MetaMenu
+var _upgrade_db: UpgradeDatabase
 @onready var game_flow = get_node("/root/GameFlow")
 
 @export var run_summary_scene: PackedScene = preload("res://scenes/ui/run_summary.tscn")
+@export var reward_selection_scene: PackedScene = preload("res://scenes/ui/reward_selection.tscn")
+@export var shop_menu_scene: PackedScene = preload("res://scenes/ui/shop_menu.tscn")
+@export var meta_menu_scene: PackedScene = preload("res://scenes/ui/meta_menu.tscn")
 @export var main_menu_scene: String = "res://scenes/ui/main_menu.tscn"
 @export var default_objective: String = "Reach the exit."
 
 func _ready():
 	_ensure_roguelike_state()
+	_upgrade_db = UpgradeDatabase.new()
+	_upgrade_db.name = "UpgradeDatabase"
+	add_child(_upgrade_db)
 	start_new_run()
 	call_deferred("_update_hud_objective")
 	_connect_player_health()
@@ -22,8 +32,22 @@ func _ready():
 func start_new_run():
 	current_run_id = "run_" + str(Time.get_unix_time_from_system())
 	is_active = true
+	if _run_summary:
+		_run_summary.queue_free()
+		_run_summary = null
+	if _reward_selection:
+		_reward_selection.queue_free()
+		_reward_selection = null
+	if _shop_menu:
+		_shop_menu.queue_free()
+		_shop_menu = null
+	if _meta_menu:
+		_meta_menu.queue_free()
+		_meta_menu = null
 	if roguelike_state:
 		roguelike_state.start_run()
+	if game_flow:
+		game_flow.set_state(game_flow.State.RUNNING)
 	print("Started new run: ", current_run_id)
 
 func end_run():
@@ -33,11 +57,14 @@ func end_run():
 	print("Run ended.")
 	if game_flow:
 		game_flow.set_state(game_flow.State.SUMMARY)
-	_return_to_main_menu()
+	_show_run_summary()
 
 func register_upgrade(upgrade_data: Dictionary) -> void:
 	if roguelike_state:
 		roguelike_state.add_upgrade(upgrade_data)
+	var player = get_tree().get_root().find_child("PlayerObject", true, false) as CharacterObject
+	if player and roguelike_state:
+		player.apply_ability_cooldown_multiplier(roguelike_state.ability_cooldown_mult)
 
 func complete_extraction() -> void:
 	if not is_active:
@@ -50,6 +77,7 @@ func _ensure_roguelike_state() -> void:
 	roguelike_state = RoguelikeState.new()
 	roguelike_state.name = "RoguelikeState"
 	add_child(roguelike_state)
+	roguelike_state.depth_changed.connect(_on_depth_changed)
 
 func _show_run_summary() -> void:
 	if _run_summary or run_summary_scene == null:
@@ -65,6 +93,12 @@ func _update_hud_objective() -> void:
 	if hud and default_objective != "":
 		hud.set_objective(default_objective)
 
+func _on_depth_changed(depth: int) -> void:
+	var hud = _get_hud()
+	if hud and roguelike_state:
+		var narrative = roguelike_state.get_narrative_line(depth)
+		hud.set_objective("%s %s" % [default_objective, narrative])
+
 func _get_hud() -> HUD:
 	var root = get_tree().current_scene
 	if not root:
@@ -77,6 +111,11 @@ func _return_to_main_menu() -> void:
 	var tree = get_tree()
 	if tree:
 		tree.call_deferred("change_scene_to_file", main_menu_scene)
+
+func return_to_menu() -> void:
+	if game_flow:
+		game_flow.set_state(game_flow.State.MENU)
+	_return_to_main_menu()
 
 func _connect_player_health() -> void:
 	var player = get_tree().get_root().find_child("PlayerObject", true, false)
@@ -100,4 +139,59 @@ func _on_node_added(node: Node) -> void:
 			node.connect("encounter_completed", Callable(self, "_on_boss_completed"))
 
 func _on_boss_completed() -> void:
+	if roguelike_state:
+		roguelike_state.advance_depth()
+	_show_reward_selection()
 	complete_extraction()
+
+func _show_reward_selection() -> void:
+	if _reward_selection or reward_selection_scene == null or not _upgrade_db:
+		return
+	_reward_selection = reward_selection_scene.instantiate() as RewardSelection
+	var root = get_tree().current_scene
+	if root:
+		root.add_child(_reward_selection)
+		var exclude_ids = roguelike_state.upgrades.map(func(upgrade): return upgrade.get("id", "")) if roguelike_state else []
+		var rewards = _upgrade_db.get_random_upgrades(3, exclude_ids)
+		_reward_selection.set_rewards(rewards)
+		_reward_selection.reward_selected.connect(_on_reward_selected)
+
+func _on_reward_selected(upgrade_data: Dictionary) -> void:
+	register_upgrade(upgrade_data)
+	_reward_selection = null
+
+func show_shop_menu() -> void:
+	if _shop_menu or shop_menu_scene == null or not _upgrade_db:
+		return
+	_shop_menu = shop_menu_scene.instantiate() as ShopMenu
+	var root = get_tree().current_scene
+	if root:
+		root.add_child(_shop_menu)
+		var items = _upgrade_db.get_random_upgrades(3, [])
+		var scrap_amount = roguelike_state.run_scrap if roguelike_state else 0
+		_shop_menu.set_shop_items(items, scrap_amount)
+		_shop_menu.purchase_requested.connect(_on_shop_purchase)
+
+func _on_shop_purchase(upgrade_data: Dictionary) -> void:
+	if not roguelike_state:
+		return
+	var cost = int(upgrade_data.get("cost", 0))
+	if roguelike_state.run_scrap < cost:
+		return
+	roguelike_state.run_scrap -= cost
+	register_upgrade(upgrade_data)
+	roguelike_state.scrap_changed.emit(roguelike_state.run_scrap, roguelike_state.meta_scrap)
+	if _shop_menu:
+		_shop_menu.queue_free()
+		_shop_menu = null
+
+func show_meta_menu() -> void:
+	if _meta_menu or meta_menu_scene == null:
+		return
+	_meta_menu = meta_menu_scene.instantiate() as MetaMenu
+	var root = get_tree().current_scene
+	if root:
+		root.add_child(_meta_menu)
+		_meta_menu.set_state(roguelike_state)
+	if game_flow:
+		game_flow.set_state(game_flow.State.META)

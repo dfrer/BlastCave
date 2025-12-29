@@ -31,6 +31,8 @@ one_shot = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0.5, 2)
 script = ExtResource("2_boss_target")
 required_impulse = 8.0
+required_explosive_type = "ImpulseCharge"
+phase_index = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="BlastTargetA"]
 shape = SubResource("CylinderShape3D_1")
@@ -47,6 +49,8 @@ shadow_enabled = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.5, 2)
 script = ExtResource("2_boss_target")
 required_impulse = 8.0
+required_explosive_type = "ShapedCharge"
+phase_index = 1
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="BlastTargetB"]
 shape = SubResource("CylinderShape3D_1")
@@ -63,6 +67,8 @@ shadow_enabled = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -2)
 script = ExtResource("2_boss_target")
 required_impulse = 8.0
+required_explosive_type = "DelayedCharge"
+phase_index = 2
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="BlastTargetC"]
 shape = SubResource("CylinderShape3D_1")
