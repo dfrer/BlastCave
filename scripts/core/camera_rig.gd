@@ -77,7 +77,8 @@ func _update_transform(delta: float) -> void:
 	var desired_offset = -pivot.global_transform.basis.z * _distance
 	var desired_camera_pos = global_position + desired_offset
 	camera.global_position = _resolve_occlusion(global_position, desired_camera_pos)
-	camera.look_at(global_position, Vector3.UP)
+	if not camera.global_position.is_equal_approx(global_position):
+		camera.look_at(global_position, Vector3.UP)
 
 func _resolve_occlusion(origin: Vector3, desired: Vector3) -> Vector3:
 	var space_state = get_world_3d().direct_space_state

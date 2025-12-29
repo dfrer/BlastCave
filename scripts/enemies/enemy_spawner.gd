@@ -40,12 +40,14 @@ func _spawn_enemy() -> void:
 	var instance = scene.instantiate() as Node3D
 	if not instance:
 		return
-	var spawn_pos = _resolve_spawn_position()
-	var parent_node = get_parent()
-	if not parent_node:
-		return
-	parent_node.add_child(instance)
+	var spawn_pos = global_position
+	var point = _pick_spawn_point()
+	if point:
+		if point.is_inside_tree():
+			spawn_pos = point.global_position
 	instance.global_position = spawn_pos
+	if get_parent():
+		get_parent().add_child.call_deferred(instance)
 	_spawned.append(instance)
 
 func _cleanup_spawned() -> void:
@@ -56,10 +58,3 @@ func _pick_spawn_point() -> Node3D:
 		return null
 	var path = spawn_points[randi() % spawn_points.size()]
 	return get_node_or_null(path) as Node3D
-
-func _resolve_spawn_position() -> Vector3:
-	var spawn_pos = global_position
-	var point = _pick_spawn_point()
-	if point and point.is_inside_tree():
-		spawn_pos = point.global_position
-	return spawn_pos
