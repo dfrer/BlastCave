@@ -26,6 +26,7 @@ func _set_selection(index: int):
 
 func start_run():
 	print("Starting Run with: ", current_selection)
+	GameFlow.set_state(GameFlow.State.RUNNING)
 	
 	# Find essential nodes in the scene tree
 	var root = get_tree().current_scene
