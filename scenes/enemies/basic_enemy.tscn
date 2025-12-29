@@ -9,11 +9,16 @@ albedo_color = Color(0.2, 0.6, 0.85, 1)
 height = 1.4
 radius = 0.4
 
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_1"]
+height = 1.4
+radius = 0.4
+
 [node name="BasicEnemy" type="CharacterBody3D"]
 script = ExtResource("1_script")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape3D_1")
 
-[node name="Mesh" type="CSGCapsule3D" parent="."]
-material = SubResource("StandardMaterial3D_1")
+[node name="Mesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("CapsuleMesh_1")
+material_override = SubResource("StandardMaterial3D_1")
