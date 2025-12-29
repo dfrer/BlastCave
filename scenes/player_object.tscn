@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/player/character_object.gd" id="1_script"]
 [ext_resource type="Script" path="res://scripts/core/health_component.gd" id="2_health"]
@@ -6,17 +6,24 @@
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_p"]
 albedo_color = Color(0.8, 0.2, 0.2, 1)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_p"]
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_p"]
+height = 1.2
+radius = 0.4
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_p"]
+height = 1.2
+radius = 0.4
 
 [node name="PlayerObject" type="RigidBody3D"]
 mass = 1.0
 script = ExtResource("1_script")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-shape = SubResource("BoxShape3D_p")
+shape = SubResource("CapsuleShape3D_p")
 
-[node name="Mesh" type="CSGBox3D" parent="."]
-material = SubResource("StandardMaterial3D_p")
+[node name="Mesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("CapsuleMesh_p")
+material_override = SubResource("StandardMaterial3D_p")
 
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("2_health")

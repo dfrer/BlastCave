@@ -2,23 +2,39 @@
 
 [ext_resource type="PackedScene" path="res://scenes/boss_node.tscn" id="1_boss_node"]
 [ext_resource type="PackedScene" path="res://scenes/puzzles/gate.tscn" id="2_gate"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
-albedo_color = Color(0.35, 0.3, 0.45, 1)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_1"]
-size = Vector3(20, 1, 20)
+[ext_resource type="PackedScene" path="res://scenes/kit/cave_floor.tscn" id="3_floor"]
+[ext_resource type="PackedScene" path="res://scenes/kit/cave_wall.tscn" id="4_wall"]
+[ext_resource type="PackedScene" path="res://scenes/kit/cave_column.tscn" id="5_column"]
 
 [node name="Room04Boss" type="Node3D"]
 
-[node name="Floor" type="CSGBox3D" parent="."]
-size = Vector3(20, 1, 20)
-material = SubResource("StandardMaterial3D_1")
+[node name="Floor" parent="." instance=ExtResource("3_floor")]
 
-[node name="StaticBody3D" type="StaticBody3D" parent="Floor"]
+[node name="WallNorth" parent="." instance=ExtResource("4_wall")]
+position = Vector3(0, 2, -9.5)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor/StaticBody3D"]
-shape = SubResource("BoxShape3D_1")
+[node name="WallSouth" parent="." instance=ExtResource("4_wall")]
+position = Vector3(0, 2, 9.5)
+
+[node name="WallEast" parent="." instance=ExtResource("4_wall")]
+position = Vector3(9.5, 2, 0)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="WallWest" parent="." instance=ExtResource("4_wall")]
+position = Vector3(-9.5, 2, 0)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="ColumnA" parent="." instance=ExtResource("5_column")]
+position = Vector3(-6, 2, -6)
+
+[node name="ColumnB" parent="." instance=ExtResource("5_column")]
+position = Vector3(6, 2, -6)
+
+[node name="ColumnC" parent="." instance=ExtResource("5_column")]
+position = Vector3(-6, 2, 6)
+
+[node name="ColumnD" parent="." instance=ExtResource("5_column")]
+position = Vector3(6, 2, 6)
 
 [node name="Entry" type="Marker3D" parent="." groups=["chunk_entry"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 10)

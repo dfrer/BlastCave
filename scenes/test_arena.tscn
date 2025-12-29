@@ -1,18 +1,34 @@
 [gd_scene load_steps=3 format=3]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
-albedo_color = Color(0.2, 0.2, 0.2, 1)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_1"]
-size = Vector3(50, 1, 50)
+[ext_resource type="PackedScene" path="res://scenes/kit/cave_floor.tscn" id="1_floor"]
+[ext_resource type="PackedScene" path="res://scenes/kit/cave_wall.tscn" id="2_wall"]
+[ext_resource type="PackedScene" path="res://scenes/kit/cave_column.tscn" id="3_column"]
 
 [node name="TestArena" type="Node3D"]
 
-[node name="Floor" type="CSGBox3D" parent="."]
-size = Vector3(50, 1, 50)
-material = SubResource("StandardMaterial3D_1")
+[node name="Floor" parent="." instance=ExtResource("1_floor")]
+scale = Vector3(2.5, 1, 2.5)
 
-[node name="StaticBody3D" type="StaticBody3D" parent="Floor"]
+[node name="WallNorth" parent="." instance=ExtResource("2_wall")]
+position = Vector3(0, 2, -24.5)
+scale = Vector3(2.5, 1, 1)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor/StaticBody3D"]
-shape = SubResource("BoxShape3D_1")
+[node name="WallSouth" parent="." instance=ExtResource("2_wall")]
+position = Vector3(0, 2, 24.5)
+scale = Vector3(2.5, 1, 1)
+
+[node name="WallEast" parent="." instance=ExtResource("2_wall")]
+position = Vector3(24.5, 2, 0)
+rotation_degrees = Vector3(0, 90, 0)
+scale = Vector3(2.5, 1, 1)
+
+[node name="WallWest" parent="." instance=ExtResource("2_wall")]
+position = Vector3(-24.5, 2, 0)
+rotation_degrees = Vector3(0, 90, 0)
+scale = Vector3(2.5, 1, 1)
+
+[node name="ColumnA" parent="." instance=ExtResource("3_column")]
+position = Vector3(-12, 2, -12)
+
+[node name="ColumnB" parent="." instance=ExtResource("3_column")]
+position = Vector3(12, 2, 12)
