@@ -36,6 +36,9 @@ func _ready():
 	_update_hud()
 
 func _process(_delta):
+	if not _is_running():
+		trajectory_node.hide_preview()
+		return
 	var mouse_pos = get_viewport().get_mouse_position()
 	var ray_hit = _get_ray_hit(mouse_pos)
 
@@ -47,6 +50,8 @@ func _process(_delta):
 	_check_stuck_condition()
 
 func _input(event):
+	if not _is_running():
+		return
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			spawn_blast_at_mouse()
@@ -146,3 +151,6 @@ func _update_hud():
 		return
 	hud.set_selected_type(explosive_types[current_type_index])
 	hud.set_counts(inventory.explosives)
+
+func _is_running() -> bool:
+	return GameState.is_running()
