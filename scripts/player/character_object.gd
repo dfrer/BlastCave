@@ -10,12 +10,17 @@ var pin_duration_remaining: float = 0.0
 var pin_cooldown_remaining: float = 0.0
 
 var characters_data: Dictionary = {}
+var movement_controller: PlayerMovement
 
 func _ready():
 	_load_characters()
 	# Optional: Set default if not set by run_start
 	if current_character_id == "":
 		set_character("core")
+	if not movement_controller:
+		movement_controller = PlayerMovement.new()
+		movement_controller.name = "PlayerMovement"
+		add_child(movement_controller)
 
 func _load_characters():
 	var file = FileAccess.open("res://data/characters.json", FileAccess.READ)
@@ -60,6 +65,8 @@ func get_current_id() -> String:
 	return current_character_id
 
 func _physics_process(delta):
+	if movement_controller and not is_pinned:
+		movement_controller.apply_movement(self, delta)
 	# Ability: Gyro Stabilize
 	if ability == "gyro_stabilize":
 		angular_velocity *= 0.95
