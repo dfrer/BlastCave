@@ -24,6 +24,7 @@ func assemble_level() -> void:
 	var previous_exits: Dictionary = {}
 	var branch_offsets: Dictionary = {0: 0.0}
 	var room_exit_map: Dictionary = {}
+	var spawn_marker: Marker3D = null
 
 	for room_data in rooms:
 		var scene: PackedScene = null
@@ -69,6 +70,8 @@ func assemble_level() -> void:
 			room.global_position += offset
 		elif entry_marker:
 			room.global_position -= entry_marker.global_position
+			if spawn_marker == null:
+				spawn_marker = entry_marker
 
 		for key in metadata.keys():
 			room.set_meta(key, metadata[key])
@@ -78,6 +81,9 @@ func assemble_level() -> void:
 			previous_exits[branch_index] = exit_marker
 			if room_id != "":
 				room_exit_map[room_id] = exit_marker
+
+	if spawn_marker:
+		_update_spawn_point(spawn_marker)
 
 func _get_marker(room: Node, group_name: StringName) -> Marker3D:
 	if group_name.is_empty():
@@ -103,3 +109,13 @@ func _attach_room_trigger(room: Node3D, metadata: Dictionary) -> void:
 	shape.shape = box
 	trigger.add_child(shape)
 	room.add_child(trigger)
+
+func _update_spawn_point(entry_marker: Marker3D) -> void:
+	var root = get_tree().current_scene
+	if not root:
+		return
+	var spawn_point = root.find_child("SpawnPoint", true, false) as Marker3D
+	if not spawn_point:
+		return
+	var inward_offset = -entry_marker.global_transform.basis.z * 2.0
+	spawn_point.global_position = entry_marker.global_position + inward_offset

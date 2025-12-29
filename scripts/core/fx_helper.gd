@@ -11,7 +11,8 @@ static func spawn_burst(parent: Node, position: Vector3, color: Color, amount: i
 	particles.emitting = true
 	particles.speed_scale = 2.0
 	particles.color = color
-	particles.initial_velocity = 6.0
+	particles.initial_velocity_min = 4.0
+	particles.initial_velocity_max = 6.0
 	particles.spread = 180.0
 	particles.global_position = position
 	parent.add_child(particles)
