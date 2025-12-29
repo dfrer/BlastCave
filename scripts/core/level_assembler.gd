@@ -52,6 +52,7 @@ func assemble_level() -> void:
 
 		add_child(room)
 		var entry_marker := _get_marker(room, entry_group)
+		var spawn_marker: Marker3D = entry_marker
 		var exit_marker := _get_marker(room, exit_group)
 
 		var is_branch_start = not previous_exits.has(branch_index)
@@ -62,19 +63,13 @@ func assemble_level() -> void:
 		if is_branch_start and parent_id != "" and room_exit_map.has(parent_id):
 			previous_exit = room_exit_map[parent_id]
 
-		if previous_exit and entry_marker:
-			var offset := previous_exit.global_position - entry_marker.global_position
+		if previous_exit and spawn_marker:
+			var offset := previous_exit.global_position - spawn_marker.global_position
 			if is_branch_start and branch_index > 0:
 				offset.x += branch_offset
 			room.global_position += offset
-		elif entry_marker:
-			room.global_position -= entry_marker.global_position
-			if spawn_marker == null:
-				spawn_marker = entry_marker
-
-		for key in metadata.keys():
-			room.set_meta(key, metadata[key])
-		_attach_room_trigger(room, metadata)
+		elif spawn_marker:
+			room.global_position -= spawn_marker.global_position
 
 		for key in metadata.keys():
 			room.set_meta(key, metadata[key])
