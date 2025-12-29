@@ -2,6 +2,7 @@ extends Node
 
 var current_selection: String = "core"
 var selections: Array = ["core", "slug", "shard", "anchor", "gyro"]
+@onready var game_flow = get_node("/root/GameFlow")
 
 func _ready():
 	print("--- BLAST CAVE: RUN START ---")
@@ -26,6 +27,8 @@ func _set_selection(index: int):
 
 func start_run():
 	print("Starting Run with: ", current_selection)
+	if game_flow:
+		game_flow.set_state(game_flow.State.RUNNING)
 	
 	# Find essential nodes in the scene tree
 	var root = get_tree().current_scene
