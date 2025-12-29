@@ -9,6 +9,9 @@ func trigger():
 	explode()
 	queue_free()
 
+func _ready() -> void:
+	explosive_type = "ShapedCharge"
+
 func calculate_impulse(target_pos: Vector3) -> Vector3:
 	var to_target = target_pos - global_position
 	var dist = to_target.length()

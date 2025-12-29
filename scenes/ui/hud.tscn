@@ -29,6 +29,19 @@ text = "Objective: Find the exit."
 [node name="DepthLabel" type="Label" parent="Panel/VBox"]
 text = "Depth: 0"
 
+[node name="AbilityLabel" type="Label" parent="Panel/VBox"]
+text = "Ability: None"
+
+[node name="AbilityCooldown" type="ProgressBar" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 14)
+value = 0.0
+
+[node name="ScrapLabel" type="Label" parent="Panel/VBox"]
+text = "Scrap: 0"
+
 [node name="HealthBar" type="ProgressBar" parent="Panel/VBox"]
 custom_minimum_size = Vector2(0, 18)
 value = 100.0
+
+[node name="InputHints" type="Label" parent="Panel/VBox"]
+text = "LMB: Place explosive | Q/E: Cycle | RMB drag: Orbit | Wheel: Zoom"

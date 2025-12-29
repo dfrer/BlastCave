@@ -6,13 +6,19 @@ class_name HUD
 @onready var objective_label: Label = $Panel/VBox/ObjectiveLabel
 @onready var depth_label: Label = $Panel/VBox/DepthLabel
 @onready var health_bar: ProgressBar = $Panel/VBox/HealthBar
+@onready var ability_label: Label = $Panel/VBox/AbilityLabel
+@onready var ability_cooldown: ProgressBar = $Panel/VBox/AbilityCooldown
+@onready var scrap_label: Label = $Panel/VBox/ScrapLabel
+@onready var input_hints: Label = $Panel/VBox/InputHints
 
 var _health_component: HealthComponent
 var _roguelike_state: RoguelikeState
+var _player: CharacterObject
 
 func _ready() -> void:
 	call_deferred("_attach_player_health")
 	call_deferred("_attach_roguelike_state")
+	call_deferred("_attach_player")
 
 func set_selected_type(type_name: String) -> void:
 	if selected_label:
@@ -44,6 +50,23 @@ func set_objective(text: String) -> void:
 func set_depth(depth: int) -> void:
 	if depth_label:
 		depth_label.text = "Depth: %d" % depth
+
+func set_ability_label(text: String) -> void:
+	if ability_label:
+		ability_label.text = text
+
+func set_ability_cooldown(current: float, max_value: float) -> void:
+	if ability_cooldown:
+		ability_cooldown.max_value = max_value
+		ability_cooldown.value = current
+
+func set_scrap(amount: int) -> void:
+	if scrap_label:
+		scrap_label.text = "Scrap: %d" % amount
+
+func set_input_hints(text: String) -> void:
+	if input_hints:
+		input_hints.text = text
 
 func _color_for_type(type_name: String) -> Color:
 	match type_name:
@@ -77,6 +100,22 @@ func _attach_roguelike_state() -> void:
 	_roguelike_state.depth_changed.connect(_on_depth_changed)
 	_on_depth_changed(_roguelike_state.current_depth)
 
+func _attach_player() -> void:
+	var player = get_tree().get_root().find_child("PlayerObject", true, false) as CharacterObject
+	if not player:
+		return
+	_player = player
+	if _player.has_signal("ability_cooldown_changed"):
+		_player.ability_cooldown_changed.connect(_on_ability_cooldown_changed)
+	if _player.has_signal("ability_state_changed"):
+		_player.ability_state_changed.connect(_on_ability_state_changed)
+	_on_ability_state_changed(_player.ability_label, _player.ability_cooldown_remaining, _player.ability_cooldown)
+
+	var inventory = get_tree().get_root().find_child("PlayerInventory", true, false) as PlayerInventory
+	if inventory:
+		inventory.scrap_changed.connect(set_scrap)
+		set_scrap(inventory.scrap)
+
 func _on_health_changed(current_health: int, max_health: int) -> void:
 	if not health_bar:
 		return
@@ -89,3 +128,10 @@ func _on_player_died() -> void:
 
 func _on_depth_changed(depth: int) -> void:
 	set_depth(depth)
+
+func _on_ability_state_changed(label_text: String, cooldown_remaining: float, cooldown_max: float) -> void:
+	set_ability_label(label_text)
+	set_ability_cooldown(cooldown_remaining, cooldown_max)
+
+func _on_ability_cooldown_changed(cooldown_remaining: float, cooldown_max: float) -> void:
+	set_ability_cooldown(cooldown_remaining, cooldown_max)

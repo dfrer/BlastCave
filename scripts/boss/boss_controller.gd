@@ -7,12 +7,15 @@ signal encounter_completed
 @export var reward_scene: PackedScene
 @export var reward_spawn_path: NodePath
 @export var reset_delay: float = 8.0
+@export var phase_reset_delay: float = 4.0
 
 @onready var reset_timer: Timer = get_node_or_null("ResetTimer")
 
 var _targets: Array[BossBlastTarget] = []
 var _completed: bool = false
 var _reward_spawned: bool = false
+var _current_phase: int = 0
+var _max_phase: int = 0
 
 func _ready() -> void:
 	_collect_targets()
@@ -21,10 +24,12 @@ func _ready() -> void:
 
 func _collect_targets() -> void:
 	_targets.clear()
+	_max_phase = 0
 	for child in get_children():
 		if child is BossBlastTarget:
 			_targets.append(child)
 			child.connect("activated", Callable(self, "_on_target_activated"))
+			_max_phase = max(_max_phase, child.phase_index)
 
 func _setup_timer() -> void:
 	if not reset_timer:
@@ -39,12 +44,14 @@ func _on_target_activated(_target: BossBlastTarget) -> void:
 		return
 	_restart_reset_timer()
 	if _all_targets_active():
-		_complete_encounter()
+		_advance_phase()
 
 func _all_targets_active() -> bool:
 	if _targets.is_empty():
 		return false
 	for target in _targets:
+		if target.phase_index != _current_phase:
+			continue
 		if not target.is_active:
 			return false
 	return true
@@ -65,8 +72,20 @@ func _on_reset_timeout() -> void:
 	if _completed:
 		return
 	for target in _targets:
-		target.reset_target()
+		if target.phase_index == _current_phase:
+			target.reset_target()
 	_update_gate_state(false)
+
+func _advance_phase() -> void:
+	if _current_phase < _max_phase:
+		_current_phase += 1
+		reset_timer.wait_time = phase_reset_delay
+		for target in _targets:
+			if target.phase_index == _current_phase:
+				target.reset_target()
+		_update_gate_state(false)
+		return
+	_complete_encounter()
 
 func _update_gate_state(open: bool) -> void:
 	var gate = get_node_or_null(gate_path)

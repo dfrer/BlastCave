@@ -1,0 +1,39 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/shop_menu.gd" id="1_shop_menu"]
+
+[node name="ShopMenu" type="CanvasLayer"]
+script = ExtResource("1_shop_menu")
+
+[node name="Panel" type="PanelContainer" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = -220.0
+offset_right = 260.0
+offset_bottom = 220.0
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel"]
+custom_minimum_size = Vector2(480, 380)
+
+[node name="VBox" type="VBoxContainer" parent="Panel/MarginContainer"]
+
+[node name="TitleLabel" type="Label" parent="Panel/MarginContainer/VBox"]
+text = "Shop"
+
+[node name="ScrapLabel" type="Label" parent="Panel/MarginContainer/VBox"]
+text = "Scrap: 0"
+
+[node name="OptionA" type="Button" parent="Panel/MarginContainer/VBox"]
+text = "Upgrade A"
+
+[node name="OptionB" type="Button" parent="Panel/MarginContainer/VBox"]
+text = "Upgrade B"
+
+[node name="OptionC" type="Button" parent="Panel/MarginContainer/VBox"]
+text = "Upgrade C"
+
+[node name="CloseButton" type="Button" parent="Panel/MarginContainer/VBox"]
+text = "Leave"
