@@ -1,0 +1,30 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
+
+[node name="MainMenu" type="CanvasLayer"]
+script = ExtResource("1_menu")
+
+[node name="Panel" type="PanelContainer" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -180.0
+offset_top = -140.0
+offset_right = 180.0
+offset_bottom = 140.0
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel"]
+custom_minimum_size = Vector2(320, 220)
+
+[node name="VBox" type="VBoxContainer" parent="Panel/MarginContainer"]
+
+[node name="TitleLabel" type="Label" parent="Panel/MarginContainer/VBox"]
+text = "Blast Cave"
+
+[node name="StartButton" type="Button" parent="Panel/MarginContainer/VBox"]
+text = "Start"
+
+[node name="ExitButton" type="Button" parent="Panel/MarginContainer/VBox"]
+text = "Exit"

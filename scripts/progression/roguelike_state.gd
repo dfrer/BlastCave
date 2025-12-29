@@ -1,6 +1,8 @@
 extends Node
 class_name RoguelikeState
 
+signal depth_changed(depth: int)
+
 var current_depth: int = 0
 var upgrades: Array = []
 var _start_time_msec: int = 0
@@ -11,6 +13,7 @@ func start_run() -> void:
 	upgrades.clear()
 	_start_time_msec = Time.get_ticks_msec()
 	_end_time_msec = 0
+	depth_changed.emit(current_depth)
 
 func end_run() -> void:
 	if _end_time_msec == 0:
@@ -18,6 +21,7 @@ func end_run() -> void:
 
 func advance_depth() -> void:
 	current_depth += 1
+	depth_changed.emit(current_depth)
 
 func add_upgrade(upgrade_data: Dictionary) -> void:
 	upgrades.append(upgrade_data)
