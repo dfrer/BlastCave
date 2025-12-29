@@ -23,6 +23,12 @@ text = "Selected: ImpulseCharge"
 
 [node name="CountsContainer" type="VBoxContainer" parent="Panel/VBox"]
 
+[node name="ObjectiveLabel" type="Label" parent="Panel/VBox"]
+text = "Objective: Find the exit."
+
+[node name="DepthLabel" type="Label" parent="Panel/VBox"]
+text = "Depth: 0"
+
 [node name="HealthBar" type="ProgressBar" parent="Panel/VBox"]
 custom_minimum_size = Vector2(0, 18)
 value = 100.0

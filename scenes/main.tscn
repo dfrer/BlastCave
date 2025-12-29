@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/run_manager.tscn" id="1_run"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_root.tscn" id="2_level_root"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://scripts/core/run_controller.gd" id="4_controller"]
 [ext_resource type="Script" path="res://scripts/core/run_start.gd" id="5_run_start"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="6_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/pause_menu.tscn" id="7_pause"]
 
 [node name="Main" type="Node3D"]
 script = ExtResource("4_controller")
@@ -29,6 +30,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 10)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
 
 [node name="HUD" parent="." instance=ExtResource("6_hud")]
+
+[node name="PauseMenu" parent="." instance=ExtResource("7_pause")]
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 10, 15)

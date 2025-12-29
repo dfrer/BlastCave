@@ -3,12 +3,16 @@ class_name HUD
 
 @onready var selected_label: Label = $Panel/VBox/SelectedTypeLabel
 @onready var counts_container: VBoxContainer = $Panel/VBox/CountsContainer
+@onready var objective_label: Label = $Panel/VBox/ObjectiveLabel
+@onready var depth_label: Label = $Panel/VBox/DepthLabel
 @onready var health_bar: ProgressBar = $Panel/VBox/HealthBar
 
 var _health_component: HealthComponent
+var _roguelike_state: RoguelikeState
 
 func _ready() -> void:
 	call_deferred("_attach_player_health")
+	call_deferred("_attach_roguelike_state")
 
 func set_selected_type(type_name: String) -> void:
 	if selected_label:
@@ -33,6 +37,14 @@ func set_counts(counts: Dictionary) -> void:
 
 		counts_container.add_child(row)
 
+func set_objective(text: String) -> void:
+	if objective_label:
+		objective_label.text = "Objective: %s" % text
+
+func set_depth(depth: int) -> void:
+	if depth_label:
+		depth_label.text = "Depth: %d" % depth
+
 func _color_for_type(type_name: String) -> Color:
 	match type_name:
 		"ImpulseCharge":
@@ -55,6 +67,16 @@ func _attach_player_health() -> void:
 	_health_component.died.connect(_on_player_died)
 	_on_health_changed(_health_component.current_health, _health_component.max_health)
 
+func _attach_roguelike_state() -> void:
+	var root = get_tree().get_root()
+	if not root:
+		return
+	_roguelike_state = root.find_child("RoguelikeState", true, false) as RoguelikeState
+	if not _roguelike_state:
+		return
+	_roguelike_state.depth_changed.connect(_on_depth_changed)
+	_on_depth_changed(_roguelike_state.current_depth)
+
 func _on_health_changed(current_health: int, max_health: int) -> void:
 	if not health_bar:
 		return
@@ -64,3 +86,6 @@ func _on_health_changed(current_health: int, max_health: int) -> void:
 
 func _on_player_died() -> void:
 	_on_health_changed(0, int(health_bar.max_value))
+
+func _on_depth_changed(depth: int) -> void:
+	set_depth(depth)
