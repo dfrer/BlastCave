@@ -41,8 +41,25 @@ func start_run():
 	
 	if player and player is RigidBody3D:
 		var spawn_pos = Vector3(0, 2, 0)
-		if spawn_point:
-			spawn_pos = spawn_point.global_position
+		
+		# Try to find a dynamic spawn point from the level assembly
+		var entries = get_tree().get_nodes_in_group("chunk_entry")
+		var found_dynamic_spawn = false
+		for entry in entries:
+			if entry is Marker3D:
+				spawn_pos = entry.global_position
+				# Offset inward so we don't spawn on the wall/boundary
+				spawn_pos.z -= 2.0
+				found_dynamic_spawn = true
+				print("Found dynamic spawn point (chunk_entry): ", entry.global_position, " -> Offset to: ", spawn_pos)
+				break
+		
+		if not found_dynamic_spawn:
+			if spawn_point:
+				spawn_pos = spawn_point.global_position
+				print("Using fallback SpawnPoint node: ", spawn_pos)
+			else:
+				print("No spawn point found, using default: ", spawn_pos)
 			
 		# Reset position and motion
 		player.linear_velocity = Vector3.ZERO
@@ -53,7 +70,7 @@ func start_run():
 		if player.has_method("set_character"):
 			player.set_character(current_selection)
 		
-		print("Player moved to spawn point: ", spawn_pos)
+		print("Player final spawn position: ", player.global_position)
 		
 		# Optional: tell other scripts run started if needed
 		# But we just need test_input to keep working.
