@@ -8,8 +8,8 @@ script = ExtResource("1_hud")
 [node name="Panel" type="PanelContainer" parent="."]
 anchor_left = 0.01
 anchor_top = 0.02
-anchor_right = 0.25
-anchor_bottom = 0.25
+anchor_right = 0.28
+anchor_bottom = 0.4
 offset_left = 0.0
 offset_top = 0.0
 offset_right = 0.0
@@ -17,6 +17,10 @@ offset_bottom = 0.0
 
 [node name="VBox" type="VBoxContainer" parent="Panel"]
 layout_mode = 1
+
+[node name="CharacterLabel" type="Label" parent="Panel/VBox"]
+theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
+text = "Character: Core"
 
 [node name="SelectedTypeLabel" type="Label" parent="Panel/VBox"]
 text = "Selected: ImpulseCharge"
@@ -35,13 +39,29 @@ text = "Ability: None"
 [node name="AbilityCooldown" type="ProgressBar" parent="Panel/VBox"]
 custom_minimum_size = Vector2(0, 14)
 value = 0.0
+show_percentage = false
 
 [node name="ScrapLabel" type="Label" parent="Panel/VBox"]
 text = "Scrap: 0"
 
 [node name="HealthBar" type="ProgressBar" parent="Panel/VBox"]
 custom_minimum_size = Vector2(0, 18)
+modulate = Color(0.3, 1, 0.3, 1)
 value = 100.0
+show_percentage = false
+
+[node name="VelocityLabel" type="Label" parent="Panel/VBox"]
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "Speed: 0.0"
+
+[node name="StuckWarning" type="Label" parent="Panel/VBox"]
+visible = false
+theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
+theme_override_font_sizes/font_size = 14
+text = "STUCK! Resetting in 3.0..."
+horizontal_alignment = 1
 
 [node name="InputHints" type="Label" parent="Panel/VBox"]
-text = "LMB: Place explosive | Q/E: Cycle | RMB drag: Orbit | Wheel: Zoom"
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 11
+text = "LMB: Place | Q/E: Cycle | RMB: Orbit | F: Ability | R: Restart"

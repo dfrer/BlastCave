@@ -8,6 +8,7 @@ class_name PlayerMovement
 @export var airborne_linear_damp: float = 0.1
 @export var max_ground_speed: float = 12.0
 @export var ground_check_distance: float = 0.6
+@export var use_camera_relative: bool = true
 
 func apply_movement(body: RigidBody3D, delta: float) -> void:
 	if not body:
@@ -32,14 +33,33 @@ func apply_movement(body: RigidBody3D, delta: float) -> void:
 
 func _get_input_direction(body: RigidBody3D) -> Vector3:
 	var dir = Vector3.ZERO
+	var forward: Vector3
+	var right: Vector3
+	
+	if use_camera_relative:
+		# Get camera and use its horizontal direction (ignore pitch)
+		var camera = body.get_viewport().get_camera_3d()
+		if camera:
+			var cam_basis = camera.global_transform.basis
+			forward = -Vector3(cam_basis.z.x, 0, cam_basis.z.z).normalized()
+			right = Vector3(cam_basis.x.x, 0, cam_basis.x.z).normalized()
+		else:
+			# Fallback if no camera
+			forward = -body.global_transform.basis.z
+			right = body.global_transform.basis.x
+	else:
+		# Body-relative (legacy behavior)
+		forward = -body.global_transform.basis.z
+		right = body.global_transform.basis.x
+	
 	if Input.is_action_pressed("move_forward"):
-		dir += -body.global_transform.basis.z
+		dir += forward
 	if Input.is_action_pressed("move_back"):
-		dir += body.global_transform.basis.z
+		dir -= forward
 	if Input.is_action_pressed("move_left"):
-		dir += -body.global_transform.basis.x
+		dir -= right
 	if Input.is_action_pressed("move_right"):
-		dir += body.global_transform.basis.x
+		dir += right
 	return dir
 
 func _is_grounded(body: RigidBody3D) -> bool:

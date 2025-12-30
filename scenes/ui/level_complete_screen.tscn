@@ -1,0 +1,87 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/level_complete_screen.gd" id="1_script"]
+
+[node name="LevelCompleteScreen" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_script")
+
+[node name="Panel" type="PanelContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -200.0
+offset_right = 220.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="Panel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TitleLabel" type="Label" parent="Panel/MarginContainer/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "LEVEL COMPLETE"
+horizontal_alignment = 1
+
+[node name="Separator1" type="HSeparator" parent="Panel/MarginContainer/VBox"]
+layout_mode = 2
+
+[node name="StatsContainer" type="VBoxContainer" parent="Panel/MarginContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DepthStat" type="Label" parent="Panel/MarginContainer/VBox/StatsContainer"]
+layout_mode = 2
+text = "Depth: 0 → 1"
+horizontal_alignment = 1
+
+[node name="TimeStat" type="Label" parent="Panel/MarginContainer/VBox/StatsContainer"]
+layout_mode = 2
+text = "Time: 0:00"
+horizontal_alignment = 1
+
+[node name="ScrapStat" type="Label" parent="Panel/MarginContainer/VBox/StatsContainer"]
+layout_mode = 2
+text = "Scrap: 0"
+horizontal_alignment = 1
+
+[node name="Separator2" type="HSeparator" parent="Panel/MarginContainer/VBox"]
+layout_mode = 2
+
+[node name="NarrativeLabel" type="Label" parent="Panel/MarginContainer/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.8, 0.9, 1)
+text = "The cave beckons deeper..."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Separator3" type="HSeparator" parent="Panel/MarginContainer/VBox"]
+layout_mode = 2
+
+[node name="ButtonContainer" type="HBoxContainer" parent="Panel/MarginContainer/VBox"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 20
+
+[node name="ContinueButton" type="Button" parent="Panel/MarginContainer/VBox/ButtonContainer"]
+custom_minimum_size = Vector2(130, 44)
+layout_mode = 2
+text = "Continue"
+
+[node name="MenuButton" type="Button" parent="Panel/MarginContainer/VBox/ButtonContainer"]
+custom_minimum_size = Vector2(130, 44)
+layout_mode = 2
+text = "Main Menu"

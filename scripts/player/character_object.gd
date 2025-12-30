@@ -111,9 +111,9 @@ func _physics_process(delta):
 		if pin_duration_remaining <= 0:
 			unpin()
 			
-	if ability == "anchor_pin" and Input.is_key_pressed(KEY_F) and not is_pinned and pin_cooldown_remaining <= 0:
+	if ability == "anchor_pin" and Input.is_action_just_pressed("ability_activate") and not is_pinned and pin_cooldown_remaining <= 0:
 		pin()
-	elif ability == "gyro_stabilize" and Input.is_key_pressed(KEY_F) and ability_cooldown_remaining <= 0.0:
+	elif ability == "gyro_stabilize" and Input.is_action_just_pressed("ability_activate") and ability_cooldown_remaining <= 0.0:
 		_trigger_gyro_stabilize()
 
 func pin():

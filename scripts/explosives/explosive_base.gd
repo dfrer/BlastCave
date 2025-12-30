@@ -7,6 +7,12 @@ class_name ExplosiveBase
 
 var is_preview: bool = false
 
+func trigger() -> void:
+	if is_preview:
+		return
+	explode()
+	queue_free()
+
 func explode():
 	var space_state = get_world_3d().direct_space_state
 	var query = PhysicsShapeQueryParameters3D.new()

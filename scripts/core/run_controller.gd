@@ -1,8 +1,12 @@
 extends Node3D
 class_name RunController
 
+signal stuck_warning_changed(time_remaining: float, is_stuck: bool)
+
 @export var player_spawn_pos: Vector3 = Vector3(0, 2, 0)
 @export var hud_path: NodePath
+@export var stuck_threshold: float = 3.0
+@export var stuck_velocity_min: float = 0.1
 
 var trajectory_node: TrajectoryPreview
 var player_obj: RigidBody3D
@@ -14,6 +18,8 @@ var _roguelike_state: RoguelikeState
 
 var explosive_types = ["ImpulseCharge", "ShapedCharge", "DelayedCharge"]
 var current_type_index = 0
+var _stuck_timer: float = 0.0
+var _is_stuck: bool = false
 @onready var game_flow = get_node("/root/GameFlow")
 
 var explosive_scripts = {
@@ -50,9 +56,10 @@ func _ready():
 	_update_hud()
 	_update_input_hints()
 
-func _process(_delta):
+func _process(delta):
 	if not _is_running():
 		trajectory_node.hide_preview()
+		_reset_stuck_timer()
 		return
 	var mouse_pos = get_viewport().get_mouse_position()
 	var ray_hit = _get_ray_hit(mouse_pos)
@@ -62,14 +69,22 @@ func _process(_delta):
 	else:
 		trajectory_node.hide_preview()
 
-	_check_stuck_condition()
+	_check_stuck_condition(delta)
 
 func _input(event):
-	if event is InputEventKey and event.pressed and event.keycode == KEY_F3:
+	# Toggle debug with input action
+	if Input.is_action_just_pressed("toggle_debug"):
 		_toggle_debug_overlay()
 		return
+	
+	# Restart run with R
+	if Input.is_action_just_pressed("restart_run") and _is_running():
+		_restart_current_run()
+		return
+	
 	if not _is_running():
 		return
+	
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			spawn_blast_at_mouse()
@@ -78,12 +93,11 @@ func _input(event):
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
 			_cycle_inventory(-1)
 
-	if event is InputEventKey and event.pressed:
-		# Use Q and E to cycle inventory to avoid conflict with character selection (1-5)
-		if event.keycode == KEY_E:
-			_cycle_inventory(1)
-		if event.keycode == KEY_Q:
-			_cycle_inventory(-1)
+	# Use input actions for cycling
+	if Input.is_action_just_pressed("cycle_explosive_next"):
+		_cycle_inventory(1)
+	if Input.is_action_just_pressed("cycle_explosive_prev"):
+		_cycle_inventory(-1)
 
 func _toggle_debug_overlay() -> void:
 	if debug_overlay:
@@ -114,6 +128,8 @@ func spawn_blast_at_mouse():
 				blast.look_at(player_obj.global_position)
 
 		blast.trigger()
+		# Player moved, reset stuck timer
+		_reset_stuck_timer()
 
 func _get_ray_hit(mouse_pos: Vector2) -> Vector3:
 	var camera = get_viewport().get_camera_3d()
@@ -156,19 +172,54 @@ func _update_trajectory_preview(blast_pos: Vector3):
 	else:
 		trajectory_node.hide_preview()
 
-func _check_stuck_condition():
+func _check_stuck_condition(delta: float):
 	if not player_obj:
 		return
-	if player_obj.linear_velocity.length() < 0.1 and inventory.get_total_count() == 0:
-		reset_object()
+	
+	var is_slow = player_obj.linear_velocity.length() < stuck_velocity_min
+	var no_explosives = inventory.get_total_count() == 0
+	
+	if is_slow and no_explosives:
+		_stuck_timer += delta
+		if _stuck_timer >= stuck_threshold:
+			reset_object()
+			_reset_stuck_timer()
+		else:
+			# Emit warning so HUD can show countdown
+			_is_stuck = true
+			stuck_warning_changed.emit(stuck_threshold - _stuck_timer, true)
+	else:
+		if _is_stuck:
+			_reset_stuck_timer()
+
+func _reset_stuck_timer() -> void:
+	if _stuck_timer > 0.0 or _is_stuck:
+		_stuck_timer = 0.0
+		_is_stuck = false
+		stuck_warning_changed.emit(0.0, false)
 
 func reset_object():
 	player_obj.linear_velocity = Vector3.ZERO
 	player_obj.angular_velocity = Vector3.ZERO
 	player_obj.global_position = player_spawn_pos
+	# Reset inventory on stuck reset
+	inventory.explosives = {
+		"ImpulseCharge": 5,
+		"ShapedCharge": 5,
+		"DelayedCharge": 5
+	}
+	inventory.inventory_changed.emit()
+	_update_hud()
+	print("Player reset to spawn - inventory refilled")
+
+func _restart_current_run() -> void:
+	get_tree().reload_current_scene()
 
 func _on_inventory_changed():
 	_update_hud()
+	# If player just used an explosive, they're not stuck
+	if inventory.get_total_count() > 0:
+		_reset_stuck_timer()
 
 func _on_scrap_changed(_amount: int) -> void:
 	_update_hud()
@@ -185,7 +236,7 @@ func _update_input_hints() -> void:
 		return
 	var hint_text = ""
 	if not _camera_settings or _camera_settings.show_input_hints:
-		hint_text = "LMB: Place explosive | Q/E: Cycle | RMB drag: Orbit | Wheel: Zoom | F: Ability"
+		hint_text = "LMB: Place | Q/E: Cycle | RMB: Orbit | F: Ability | R: Restart"
 	hud.set_input_hints(hint_text)
 
 func _apply_explosive_upgrades(blast: ExplosiveBase) -> void:

@@ -9,6 +9,8 @@ var _run_summary: RunSummary
 var _reward_selection: RewardSelection
 var _shop_menu: ShopMenu
 var _meta_menu: MetaMenu
+var _game_over_screen: GameOverScreen
+var _level_complete_screen: LevelCompleteScreen
 var _upgrade_db: UpgradeDatabase
 @onready var game_flow = get_node("/root/GameFlow")
 
@@ -16,6 +18,8 @@ var _upgrade_db: UpgradeDatabase
 @export var reward_selection_scene: PackedScene = preload("res://scenes/ui/reward_selection.tscn")
 @export var shop_menu_scene: PackedScene = preload("res://scenes/ui/shop_menu.tscn")
 @export var meta_menu_scene: PackedScene = preload("res://scenes/ui/meta_menu.tscn")
+@export var game_over_scene: PackedScene = preload("res://scenes/ui/game_over_screen.tscn")
+@export var level_complete_scene: PackedScene = preload("res://scenes/ui/level_complete_screen.tscn")
 @export var main_menu_scene: String = "res://scenes/ui/main_menu.tscn"
 @export var default_objective: String = "Reach the exit."
 
@@ -32,6 +36,14 @@ func _ready():
 func start_new_run():
 	current_run_id = "run_" + str(Time.get_unix_time_from_system())
 	is_active = true
+	_cleanup_ui_screens()
+	if roguelike_state:
+		roguelike_state.start_run()
+	if game_flow:
+		game_flow.set_state(game_flow.State.RUNNING)
+	print("Started new run: ", current_run_id)
+
+func _cleanup_ui_screens() -> void:
 	if _run_summary:
 		_run_summary.queue_free()
 		_run_summary = null
@@ -44,11 +56,12 @@ func start_new_run():
 	if _meta_menu:
 		_meta_menu.queue_free()
 		_meta_menu = null
-	if roguelike_state:
-		roguelike_state.start_run()
-	if game_flow:
-		game_flow.set_state(game_flow.State.RUNNING)
-	print("Started new run: ", current_run_id)
+	if _game_over_screen:
+		_game_over_screen.queue_free()
+		_game_over_screen = null
+	if _level_complete_screen:
+		_level_complete_screen.queue_free()
+		_level_complete_screen = null
 
 func end_run():
 	is_active = false
@@ -57,7 +70,16 @@ func end_run():
 	print("Run ended.")
 	if game_flow:
 		game_flow.set_state(game_flow.State.SUMMARY)
-	_show_run_summary()
+
+func end_run_death() -> void:
+	end_run()
+	_show_game_over()
+
+func end_run_level_complete() -> void:
+	# Don't fully end run - just show level complete for continuation
+	if game_flow:
+		game_flow.set_state(game_flow.State.META)
+	_show_level_complete()
 
 func register_upgrade(upgrade_data: Dictionary) -> void:
 	if roguelike_state:
@@ -69,7 +91,7 @@ func register_upgrade(upgrade_data: Dictionary) -> void:
 func complete_extraction() -> void:
 	if not is_active:
 		return
-	end_run()
+	end_run_level_complete()
 
 func _ensure_roguelike_state() -> void:
 	if roguelike_state:
@@ -78,6 +100,24 @@ func _ensure_roguelike_state() -> void:
 	roguelike_state.name = "RoguelikeState"
 	add_child(roguelike_state)
 	roguelike_state.depth_changed.connect(_on_depth_changed)
+
+func _show_game_over() -> void:
+	if _game_over_screen or game_over_scene == null:
+		return
+	_game_over_screen = game_over_scene.instantiate() as GameOverScreen
+	var root = get_tree().current_scene
+	if root and _game_over_screen:
+		root.add_child(_game_over_screen)
+		_game_over_screen.show_game_over(roguelike_state)
+
+func _show_level_complete() -> void:
+	if _level_complete_screen or level_complete_scene == null:
+		return
+	_level_complete_screen = level_complete_scene.instantiate() as LevelCompleteScreen
+	var root = get_tree().current_scene
+	if root and _level_complete_screen:
+		root.add_child(_level_complete_screen)
+		_level_complete_screen.show_level_complete(roguelike_state)
 
 func _show_run_summary() -> void:
 	if _run_summary or run_summary_scene == null:
@@ -129,7 +169,7 @@ func _connect_player_health() -> void:
 
 func _on_player_died() -> void:
 	if is_active:
-		end_run()
+		end_run_death()
 
 func _on_node_added(node: Node) -> void:
 	if node.name == "PlayerObject":
@@ -139,8 +179,6 @@ func _on_node_added(node: Node) -> void:
 			node.connect("encounter_completed", Callable(self, "_on_boss_completed"))
 
 func _on_boss_completed() -> void:
-	if roguelike_state:
-		roguelike_state.advance_depth()
 	_show_reward_selection()
 	complete_extraction()
 

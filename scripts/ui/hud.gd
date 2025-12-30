@@ -10,15 +10,25 @@ class_name HUD
 @onready var ability_cooldown: ProgressBar = $Panel/VBox/AbilityCooldown
 @onready var scrap_label: Label = $Panel/VBox/ScrapLabel
 @onready var input_hints: Label = $Panel/VBox/InputHints
+@onready var velocity_label: Label = $Panel/VBox/VelocityLabel
+@onready var stuck_warning: Label = $Panel/VBox/StuckWarning
+@onready var character_label: Label = $Panel/VBox/CharacterLabel
 
 var _health_component: HealthComponent
 var _roguelike_state: RoguelikeState
 var _player: CharacterObject
+var _run_controller: RunController
 
 func _ready() -> void:
 	call_deferred("_attach_player_health")
 	call_deferred("_attach_roguelike_state")
 	call_deferred("_attach_player")
+	call_deferred("_attach_run_controller")
+	if stuck_warning:
+		stuck_warning.visible = false
+
+func _process(_delta: float) -> void:
+	_update_velocity_display()
 
 func set_selected_type(type_name: String) -> void:
 	if selected_label:
@@ -68,6 +78,18 @@ func set_input_hints(text: String) -> void:
 	if input_hints:
 		input_hints.text = text
 
+func set_character_name(character_name: String) -> void:
+	if character_label:
+		character_label.text = "Character: %s" % character_name
+
+func set_stuck_warning(time_remaining: float, is_stuck: bool) -> void:
+	if not stuck_warning:
+		return
+	stuck_warning.visible = is_stuck
+	if is_stuck:
+		stuck_warning.text = "STUCK! Resetting in %.1f..." % time_remaining
+		stuck_warning.modulate = Color(1.0, 0.3, 0.3)
+
 func _color_for_type(type_name: String) -> Color:
 	match type_name:
 		"ImpulseCharge":
@@ -110,11 +132,37 @@ func _attach_player() -> void:
 	if _player.has_signal("ability_state_changed"):
 		_player.ability_state_changed.connect(_on_ability_state_changed)
 	_on_ability_state_changed(_player.ability_label, _player.ability_cooldown_remaining, _player.ability_cooldown)
+	
+	# Show current character
+	set_character_name(_player.current_character_id.capitalize())
 
 	var inventory = get_tree().get_root().find_child("PlayerInventory", true, false) as PlayerInventory
 	if inventory:
 		inventory.scrap_changed.connect(set_scrap)
 		set_scrap(inventory.scrap)
+
+func _attach_run_controller() -> void:
+	var scene = get_tree().current_scene
+	if not scene:
+		return
+	_run_controller = scene as RunController
+	if not _run_controller:
+		_run_controller = scene.find_child("Main", true, false) as RunController
+	if _run_controller and _run_controller.has_signal("stuck_warning_changed"):
+		_run_controller.stuck_warning_changed.connect(_on_stuck_warning_changed)
+
+func _update_velocity_display() -> void:
+	if not velocity_label or not _player:
+		return
+	var speed = _player.linear_velocity.length()
+	velocity_label.text = "Speed: %.1f" % speed
+	# Color based on speed
+	if speed < 0.5:
+		velocity_label.modulate = Color(0.6, 0.6, 0.6)
+	elif speed < 5.0:
+		velocity_label.modulate = Color(1.0, 1.0, 1.0)
+	else:
+		velocity_label.modulate = Color(0.5, 1.0, 0.5)
 
 func _on_health_changed(current_health: int, max_health: int) -> void:
 	if not health_bar:
@@ -122,6 +170,14 @@ func _on_health_changed(current_health: int, max_health: int) -> void:
 	health_bar.max_value = max_health
 	health_bar.value = current_health
 	health_bar.tooltip_text = "Health: %d/%d" % [current_health, max_health]
+	# Color gradient based on health percentage
+	var health_pct = float(current_health) / float(max_health)
+	if health_pct > 0.6:
+		health_bar.modulate = Color(0.3, 1.0, 0.3)
+	elif health_pct > 0.3:
+		health_bar.modulate = Color(1.0, 0.8, 0.2)
+	else:
+		health_bar.modulate = Color(1.0, 0.3, 0.3)
 
 func _on_player_died() -> void:
 	_on_health_changed(0, int(health_bar.max_value))
@@ -135,3 +191,6 @@ func _on_ability_state_changed(label_text: String, cooldown_remaining: float, co
 
 func _on_ability_cooldown_changed(cooldown_remaining: float, cooldown_max: float) -> void:
 	set_ability_cooldown(cooldown_remaining, cooldown_max)
+
+func _on_stuck_warning_changed(time_remaining: float, is_stuck: bool) -> void:
+	set_stuck_warning(time_remaining, is_stuck)

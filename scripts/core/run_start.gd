@@ -13,13 +13,15 @@ func _ready():
 
 func _input(event):
 	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_1: _set_selection(0)
-		elif event.keycode == KEY_2: _set_selection(1)
-		elif event.keycode == KEY_3: _set_selection(2)
-		elif event.keycode == KEY_4: _set_selection(3)
-		elif event.keycode == KEY_5: _set_selection(4)
-		elif event.keycode == KEY_ENTER:
+		if event.keycode == KEY_ENTER:
 			start_run()
+	
+	# Use input actions for character selection
+	if Input.is_action_just_pressed("select_char_1"): _set_selection(0)
+	if Input.is_action_just_pressed("select_char_2"): _set_selection(1)
+	if Input.is_action_just_pressed("select_char_3"): _set_selection(2)
+	if Input.is_action_just_pressed("select_char_4"): _set_selection(3)
+	if Input.is_action_just_pressed("select_char_5"): _set_selection(4)
 
 func _set_selection(index: int):
 	current_selection = selections[index]
@@ -50,6 +52,7 @@ func start_run():
 				spawn_pos = entry.global_position
 				# Offset inward so we don't spawn on the wall/boundary
 				spawn_pos.z -= 2.0
+				spawn_pos.y += 0.5  # Slight vertical offset for safety
 				found_dynamic_spawn = true
 				print("Found dynamic spawn point (chunk_entry): ", entry.global_position, " -> Offset to: ", spawn_pos)
 				break
@@ -60,7 +63,10 @@ func start_run():
 				print("Using fallback SpawnPoint node: ", spawn_pos)
 			else:
 				print("No spawn point found, using default: ", spawn_pos)
-			
+		
+		# Validate spawn position with raycast to ensure not inside geometry
+		spawn_pos = _validate_spawn_position(player, spawn_pos)
+		
 		# Reset position and motion
 		player.linear_velocity = Vector3.ZERO
 		player.angular_velocity = Vector3.ZERO
@@ -72,7 +78,33 @@ func start_run():
 		
 		print("Player final spawn position: ", player.global_position)
 		
-		# Optional: tell other scripts run started if needed
-		# But we just need test_input to keep working.
 	else:
 		print("Error: Could not find PlayerObject.")
+
+func _validate_spawn_position(player: RigidBody3D, spawn_pos: Vector3) -> Vector3:
+	var space_state = player.get_world_3d().direct_space_state
+	if not space_state:
+		return spawn_pos
+	
+	# Cast ray downward to find ground
+	var from = spawn_pos + Vector3.UP * 2.0
+	var to = spawn_pos + Vector3.DOWN * 2.0
+	var query = PhysicsRayQueryParameters3D.create(from, to)
+	query.exclude = [player]
+	var result = space_state.intersect_ray(query)
+	
+	if result:
+		# Found ground, spawn slightly above it
+		var ground_pos = result.position
+		return ground_pos + Vector3.UP * 1.0
+	
+	# Cast ray from origin to spawn_pos to check for obstacles
+	var center_query = PhysicsRayQueryParameters3D.create(Vector3(0, 5, 0), spawn_pos)
+	center_query.exclude = [player]
+	var center_result = space_state.intersect_ray(center_query)
+	
+	if center_result:
+		# Hit something, spawn at hit point with offset
+		return center_result.position + center_result.normal * 1.5
+	
+	return spawn_pos
