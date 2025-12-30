@@ -11,7 +11,7 @@ static func spawn_burst(parent: Node, position: Vector3, color: Color, amount: i
 	particles.emitting = true
 	particles.speed_scale = 2.0
 	particles.color = color
-	var material = ParticlesMaterial.new()
+	var material = ParticleProcessMaterial.new()
 	material.initial_velocity = 6.0
 	material.spread = 180.0
 	particles.process_material = material
