@@ -15,7 +15,7 @@ static func spawn_burst(parent: Node, position: Vector3, color: Color, amount: i
 	material.initial_velocity_min = 6.0
 	material.initial_velocity_max = 6.0
 	material.spread = 180.0
-	particles.process_material = material
+	particles.material = material
 	if parent is Node3D:
 		particles.position = parent.to_local(position)
 	parent.add_child.call_deferred(particles)
