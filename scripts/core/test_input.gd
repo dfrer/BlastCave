@@ -9,10 +9,10 @@ var inventory: PlayerInventory
 var explosive_types = ["ImpulseCharge", "ShapedCharge", "DelayedCharge"]
 var current_type_index = 0
 
-var explosive_scripts = {
-	"ImpulseCharge": preload("res://scripts/explosives/impulse_charge.gd"),
-	"ShapedCharge": preload("res://scripts/explosives/shaped_charge.gd"),
-	"DelayedCharge": preload("res://scripts/explosives/delayed_charge.gd")
+var explosive_scenes = {
+	"ImpulseCharge": preload("res://scenes/explosives/impulse_charge.tscn"),
+	"ShapedCharge": preload("res://scenes/explosives/shaped_charge.tscn"),
+	"DelayedCharge": preload("res://scenes/explosives/delayed_charge.tscn")
 }
 
 func _ready():
@@ -33,10 +33,15 @@ func _process(_delta):
 	
 	if ray_hit != Vector3.ZERO and player_obj:
 		_update_trajectory_preview(ray_hit)
+		# Pass look target to character
+		if player_obj.has_method("set_look_target"):
+			player_obj.set_look_target(ray_hit)
 	else:
 		trajectory_node.hide_preview()
+		if player_obj and player_obj.has_method("clear_look_target"):
+			player_obj.clear_look_target()
 		
-	_check_stuck_condition()
+	_check_stuck_condition(_delta)
 
 func _input(event):
 	if event is InputEventMouseButton:
@@ -54,7 +59,11 @@ func _input(event):
 
 func _cycle_inventory(dir: int):
 	current_type_index = (current_type_index + dir + explosive_types.size()) % explosive_types.size()
-	print("Selected Explosive: ", explosive_types[current_type_index])
+	var type = explosive_types[current_type_index]
+	print("Selected Explosive: ", type)
+	# Update character eye color
+	if player_obj and player_obj.has_method("set_explosive_type"):
+		player_obj.set_explosive_type(type)
 
 func spawn_blast_at_mouse():
 	var type = explosive_types[current_type_index]
@@ -65,8 +74,8 @@ func spawn_blast_at_mouse():
 	var ray_hit = _get_ray_hit(get_viewport().get_mouse_position())
 	if ray_hit != Vector3.ZERO:
 		inventory.use_explosive(type)
-		var script = explosive_scripts[type]
-		var blast = script.new() as ExplosiveBase
+		var scene = explosive_scenes[type]
+		var blast = scene.instantiate() as ExplosiveBase
 		add_child(blast)
 		blast.global_position = ray_hit
 		
@@ -93,9 +102,9 @@ func _get_ray_hit(mouse_pos: Vector2) -> Vector3:
 
 func _update_trajectory_preview(blast_pos: Vector3):
 	var type = explosive_types[current_type_index]
-	var script = explosive_scripts[type]
+	var scene = explosive_scenes[type]
 	
-	var temp_blast = script.new() as ExplosiveBase
+	var temp_blast = scene.instantiate() as ExplosiveBase
 	temp_blast.is_preview = true
 	add_child(temp_blast)
 	temp_blast.global_position = blast_pos
@@ -115,10 +124,30 @@ func _update_trajectory_preview(blast_pos: Vector3):
 	else:
 		trajectory_node.hide_preview()
 
-func _check_stuck_condition():
+var _stuck_timer: float = 0.0
+const STUCK_THRESHOLD: float = 3.0
+
+func _check_stuck_condition(delta: float):
 	if not player_obj: return
-	if player_obj.linear_velocity.length() < 0.1 and inventory.get_total_count() == 0:
-		reset_object()
+	
+	var is_moving = player_obj.linear_velocity.length() > 0.1
+	var has_ammo = inventory.get_total_count() > 0
+	
+	if not is_moving and not has_ammo:
+		_stuck_timer += delta
+		var hud = get_tree().get_root().find_child("HUD", true, false)
+		if hud:
+			hud.set_stuck_warning(STUCK_THRESHOLD - _stuck_timer, true)
+			
+		if _stuck_timer >= STUCK_THRESHOLD:
+			reset_object()
+			_stuck_timer = 0.0
+	else:
+		if _stuck_timer > 0:
+			_stuck_timer = 0.0
+			var hud = get_tree().get_root().find_child("HUD", true, false)
+			if hud:
+				hud.set_stuck_warning(0, false)
 
 func reset_object():
 	player_obj.linear_velocity = Vector3.ZERO

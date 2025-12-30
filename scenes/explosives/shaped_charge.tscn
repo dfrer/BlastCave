@@ -1,0 +1,50 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/explosives/shaped_charge.gd" id="1_script"]
+
+[sub_resource type="StandardMaterial3D" id="mat_cone"]
+albedo_color = Color(0.9, 0.7, 0.1, 1)
+emission_enabled = true
+emission = Color(0.8, 0.6, 0.0, 1)
+
+[sub_resource type="CylinderMesh" id="mesh_cone"]
+top_radius = 0.05
+bottom_radius = 0.2
+height = 0.4
+
+[sub_resource type="StandardMaterial3D" id="mat_aperture"]
+albedo_color = Color(0.1, 0.1, 0.1, 1)
+metallic = 1.0
+roughness = 0.2
+
+[sub_resource type="CylinderMesh" id="mesh_aperture"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 0.05
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_1"]
+height = 0.4
+radius = 0.22
+
+[node name="ShapedCharge" type="Node3D"]
+script = ExtResource("1_script")
+blast_force = 25.0
+blast_radius = 4.0
+
+[node name="Model" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
+
+[node name="Cone" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+mesh = SubResource("mesh_cone")
+material_override = SubResource("mat_cone")
+
+[node name="Base" type="MeshInstance3D" parent="Model"]
+mesh = SubResource("mesh_aperture")
+material_override = SubResource("mat_aperture")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0.2)
+shape = SubResource("CylinderShape3D_1")

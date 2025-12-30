@@ -1,18 +1,18 @@
 extends CanvasLayer
 class_name HUD
 
-@onready var selected_label: Label = $Panel/VBox/SelectedTypeLabel
-@onready var counts_container: VBoxContainer = $Panel/VBox/CountsContainer
-@onready var objective_label: Label = $Panel/VBox/ObjectiveLabel
-@onready var depth_label: Label = $Panel/VBox/DepthLabel
-@onready var health_bar: ProgressBar = $Panel/VBox/HealthBar
-@onready var ability_label: Label = $Panel/VBox/AbilityLabel
-@onready var ability_cooldown: ProgressBar = $Panel/VBox/AbilityCooldown
-@onready var scrap_label: Label = $Panel/VBox/ScrapLabel
-@onready var input_hints: Label = $Panel/VBox/InputHints
-@onready var velocity_label: Label = $Panel/VBox/VelocityLabel
-@onready var stuck_warning: Label = $Panel/VBox/StuckWarning
-@onready var character_label: Label = $Panel/VBox/CharacterLabel
+@onready var selected_label: Label = $RightVisor/Panel/VBox/SelectedTypeLabel
+@onready var counts_container: VBoxContainer = $RightVisor/Panel/VBox/CountsScroll/CountsContainer
+@onready var objective_label: Label = $TopVisor/Panel/VBox/ObjectiveLabel
+@onready var depth_label: Label = $TopVisor/Panel/VBox/DepthLabel
+@onready var health_bar: ProgressBar = $LeftVisor/Panel/VBox/HealthBar
+@onready var ability_label: Label = $LeftVisor/Panel/VBox/AbilityLabel
+@onready var ability_cooldown: ProgressBar = $LeftVisor/Panel/VBox/AbilityCooldown
+@onready var scrap_label: Label = $RightVisor/Panel/VBox/ScrapLabel
+@onready var input_hints: Label = $BottomVisor/VBox/InputHints
+@onready var velocity_label: Label = $BottomVisor/VBox/VelocityLabel
+@onready var stuck_warning: Label = $BottomVisor/VBox/StuckWarning
+@onready var character_label: Label = $LeftVisor/Panel/VBox/CharacterLabel
 
 var _health_component: HealthComponent
 var _roguelike_state: RoguelikeState
@@ -32,7 +32,7 @@ func _process(_delta: float) -> void:
 
 func set_selected_type(type_name: String) -> void:
 	if selected_label:
-		selected_label.text = "Selected: %s" % type_name
+		selected_label.text = "ORDNANCE: %s" % type_name.to_upper().replace("CHARGE", "")
 
 func set_counts(counts: Dictionary) -> void:
 	if not counts_container:
@@ -55,11 +55,11 @@ func set_counts(counts: Dictionary) -> void:
 
 func set_objective(text: String) -> void:
 	if objective_label:
-		objective_label.text = "Objective: %s" % text
+		objective_label.text = "OBJ: %s" % text.to_upper()
 
 func set_depth(depth: int) -> void:
 	if depth_label:
-		depth_label.text = "Depth: %d" % depth
+		depth_label.text = "DEPTH: %d" % depth
 
 func set_ability_label(text: String) -> void:
 	if ability_label:
@@ -80,7 +80,7 @@ func set_input_hints(text: String) -> void:
 
 func set_character_name(character_name: String) -> void:
 	if character_label:
-		character_label.text = "Character: %s" % character_name
+		character_label.text = "PILOT: %s" % character_name.to_upper()
 
 func set_stuck_warning(time_remaining: float, is_stuck: bool) -> void:
 	if not stuck_warning:
@@ -155,7 +155,7 @@ func _update_velocity_display() -> void:
 	if not velocity_label or not _player:
 		return
 	var speed = _player.linear_velocity.length()
-	velocity_label.text = "Speed: %.1f" % speed
+	velocity_label.text = "SPD: %.1f m/s" % speed
 	# Color based on speed
 	if speed < 0.5:
 		velocity_label.modulate = Color(0.6, 0.6, 0.6)

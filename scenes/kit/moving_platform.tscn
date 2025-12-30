@@ -1,0 +1,24 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/levels/moving_platform.gd" id="1_script"]
+
+[sub_resource type="StandardMaterial3D" id="mat_platform"]
+albedo_color = Color(0.4, 0.45, 0.5, 1)
+metallic = 0.5
+roughness = 0.5
+
+[sub_resource type="BoxMesh" id="mesh_platform"]
+size = Vector3(3, 0.4, 3)
+
+[sub_resource type="BoxShape3D" id="shape_platform"]
+size = Vector3(3, 0.4, 3)
+
+[node name="MovingPlatform" type="AnimatableBody3D"]
+script = ExtResource("1_script")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("mesh_platform")
+material_override = SubResource("mat_platform")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("shape_platform")

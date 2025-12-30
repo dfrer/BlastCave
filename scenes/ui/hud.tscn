@@ -1,67 +1,246 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/hud.gd" id="1_hud"]
+[ext_resource type="Shader" path="res://shaders/visor_overlay.gdshader" id="2_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1"]
+shader = ExtResource("2_shader")
+shader_parameter/scanline_count = 540.0
+shader_parameter/scanline_opacity = 0.05
+shader_parameter/vignette_intensity = 0.4
+shader_parameter/vignette_opacity = 0.5
+shader_parameter/aberration = 0.002
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Visor"]
+bg_color = Color(0, 0.05, 0.1, 0.4)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.6, 1, 0.6)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+expand_margin_left = 4.0
+expand_margin_top = 4.0
+expand_margin_right = 4.0
+expand_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Health"]
+bg_color = Color(0.1, 0.8, 0.2, 0.8)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
 
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource("1_hud")
 
-[node name="Panel" type="PanelContainer" parent="."]
-anchor_left = 0.01
-anchor_top = 0.02
-anchor_right = 0.28
-anchor_bottom = 0.4
-offset_left = 0.0
-offset_top = 0.0
-offset_right = 0.0
-offset_bottom = 0.0
+[node name="VisorOverlay" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_1")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
 
-[node name="VBox" type="VBoxContainer" parent="Panel"]
+[node name="LeftVisor" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 40.0
+offset_top = -100.0
+offset_right = 240.0
+offset_bottom = 100.0
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="LeftVisor"]
 layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_Visor")
 
-[node name="CharacterLabel" type="Label" parent="Panel/VBox"]
-theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
-text = "Character: Core"
+[node name="VBox" type="VBoxContainer" parent="LeftVisor/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
 
-[node name="SelectedTypeLabel" type="Label" parent="Panel/VBox"]
-text = "Selected: ImpulseCharge"
+[node name="CharacterLabel" type="Label" parent="LeftVisor/Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "PILOT: CORE"
+horizontal_alignment = 1
 
-[node name="CountsContainer" type="VBoxContainer" parent="Panel/VBox"]
+[node name="HSeparator" type="HSeparator" parent="LeftVisor/Panel/VBox"]
+layout_mode = 2
 
-[node name="ObjectiveLabel" type="Label" parent="Panel/VBox"]
-text = "Objective: Find the exit."
+[node name="HealthLabel" type="Label" parent="LeftVisor/Panel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "INTEGRITY"
 
-[node name="DepthLabel" type="Label" parent="Panel/VBox"]
-text = "Depth: 0"
-
-[node name="AbilityLabel" type="Label" parent="Panel/VBox"]
-text = "Ability: None"
-
-[node name="AbilityCooldown" type="ProgressBar" parent="Panel/VBox"]
-custom_minimum_size = Vector2(0, 14)
-value = 0.0
-show_percentage = false
-
-[node name="ScrapLabel" type="Label" parent="Panel/VBox"]
-text = "Scrap: 0"
-
-[node name="HealthBar" type="ProgressBar" parent="Panel/VBox"]
-custom_minimum_size = Vector2(0, 18)
-modulate = Color(0.3, 1, 0.3, 1)
+[node name="HealthBar" type="ProgressBar" parent="LeftVisor/Panel/VBox"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_Health")
 value = 100.0
 show_percentage = false
 
-[node name="VelocityLabel" type="Label" parent="Panel/VBox"]
-theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
-text = "Speed: 0.0"
+[node name="AbilityLabel" type="Label" parent="LeftVisor/Panel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "SYSTEM: NONE"
 
-[node name="StuckWarning" type="Label" parent="Panel/VBox"]
-visible = false
-theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
-theme_override_font_sizes/font_size = 14
-text = "STUCK! Resetting in 3.0..."
+[node name="AbilityCooldown" type="ProgressBar" parent="LeftVisor/Panel/VBox"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+value = 50.0
+show_percentage = false
+
+[node name="RightVisor" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -100.0
+offset_right = -40.0
+offset_bottom = 100.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="RightVisor"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_Visor")
+
+[node name="VBox" type="VBoxContainer" parent="RightVisor/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SelectedTypeLabel" type="Label" parent="RightVisor/Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.2, 1)
+text = "ORDNANCE: IMPULSE"
 horizontal_alignment = 1
 
-[node name="InputHints" type="Label" parent="Panel/VBox"]
+[node name="HSeparator" type="HSeparator" parent="RightVisor/Panel/VBox"]
+layout_mode = 2
+
+[node name="CountsScroll" type="ScrollContainer" parent="RightVisor/Panel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CountsContainer" type="VBoxContainer" parent="RightVisor/Panel/VBox/CountsScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ScrapLabel" type="Label" parent="RightVisor/Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 1, 0.8, 1)
+text = "SCRAP: 0"
+horizontal_alignment = 2
+
+[node name="TopVisor" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -150.0
+offset_top = 20.0
+offset_right = 150.0
+offset_bottom = 80.0
+grow_horizontal = 2
+
+[node name="Panel" type="Panel" parent="TopVisor"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_Visor")
+
+[node name="VBox" type="VBoxContainer" parent="TopVisor/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="DepthLabel" type="Label" parent="TopVisor/Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.4, 0.2, 1)
+text = "DEPTH: 0"
+horizontal_alignment = 1
+
+[node name="ObjectiveLabel" type="Label" parent="TopVisor/Panel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "OBJ: FIND THE EXIT"
+horizontal_alignment = 1
+
+[node name="BottomVisor" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -80.0
+offset_right = 300.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="VBox" type="VBoxContainer" parent="BottomVisor"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="StuckWarning" type="Label" parent="BottomVisor/VBox"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.2, 0.2, 1)
+theme_override_font_sizes/font_size = 18
+text = "STUCK! AUTO-RELOAD IN 3s"
+horizontal_alignment = 1
+
+[node name="VelocityLabel" type="Label" parent="BottomVisor/VBox"]
+layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
-theme_override_font_sizes/font_size = 11
-text = "LMB: Place | Q/E: Cycle | RMB: Orbit | F: Ability | R: Restart"
+text = "SPD: 0.0 m/s"
+horizontal_alignment = 1
+
+[node name="InputHints" type="Label" parent="BottomVisor/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 10
+text = "LMB: BLAST | Q/E: CYCLE | F: ABILITY | R: RESTART"
+horizontal_alignment = 1

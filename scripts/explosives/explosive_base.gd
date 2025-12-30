@@ -41,9 +41,19 @@ func explode():
 					collider.apply_blast_impulse_with_type(final_impulse, explosive_type)
 				elif collider.has_method("apply_blast_impulse"):
 					collider.apply_blast_impulse(final_impulse)
+				
+				# Apply damage to destructibles
+				if collider.has_method("take_damage"):
+					# Damage based on impulse magnitude
+					var damage = final_impulse.length() * 0.5
+					collider.take_damage(damage, final_impulse, collider.global_position)
 
 	FXHelper.spawn_burst(get_parent(), global_position, Color(1.0, 0.7, 0.2))
+	FXHelper.spawn_dust(get_parent(), global_position)
 	FXHelper.spawn_sfx(get_parent(), global_position, 1.2)
+	
+	# Trigger screen shake based on blast force
+	FXHelper.screen_shake(self, blast_force * 0.05)
 
 # Virtual method to be overridden by subclasses
 func calculate_impulse(target_pos: Vector3) -> Vector3:

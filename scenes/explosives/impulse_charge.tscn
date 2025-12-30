@@ -1,0 +1,83 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/explosives/impulse_charge.gd" id="1_script"]
+
+[sub_resource type="StandardMaterial3D" id="mat_orb"]
+albedo_color = Color(0.2, 0.4, 0.8, 1)
+emission_enabled = true
+emission = Color(0.2, 0.6, 1.0, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="SphereMesh" id="mesh_orb"]
+radius = 0.15
+height = 0.3
+
+[sub_resource type="StandardMaterial3D" id="mat_ring"]
+transparency = 1
+albedo_color = Color(0.4, 0.8, 1.0, 0.4)
+emission_enabled = true
+emission = Color(0.4, 0.8, 1.0, 1)
+
+[sub_resource type="TorusMesh" id="mesh_ring"]
+inner_radius = 0.2
+outer_radius = 0.25
+
+[sub_resource type="Animation" id="Animation_1"]
+resource_name = "pulse"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Ring:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5, 1),
+"transitions": PackedFloat32Array(0.5, 2, 1),
+"update": 0,
+"values": [Vector3(1, 1, 1), Vector3(1.2, 1.2, 1.2), Vector3(1, 1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Ring:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0, 6.28319, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_1"]
+_data = {
+"pulse": SubResource("Animation_1")
+}
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_1"]
+radius = 0.15
+
+[node name="ImpulseCharge" type="Node3D"]
+script = ExtResource("1_script")
+blast_force = 12.0
+blast_radius = 6.0
+
+[node name="Orb" type="MeshInstance3D" parent="."]
+mesh = SubResource("mesh_orb")
+material_override = SubResource("mat_orb")
+
+[node name="Ring" type="MeshInstance3D" parent="."]
+mesh = SubResource("mesh_ring")
+material_override = SubResource("mat_ring")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_1")
+}
+autoplay = "pulse"
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+shape = SubResource("SphereShape3D_1")

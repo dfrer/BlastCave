@@ -1,0 +1,200 @@
+[gd_scene load_steps=18 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/kit/cave_floor.tscn" id="1_floor"]
+[ext_resource type="PackedScene" path="res://scenes/kit/cave_wall.tscn" id="2_wall"]
+[ext_resource type="PackedScene" path="res://scenes/kit/cave_column.tscn" id="3_column"]
+[ext_resource type="PackedScene" path="res://scenes/kit/moving_platform.tscn" id="4_platform"]
+
+[sub_resource type="StandardMaterial3D" id="mat_rock"]
+albedo_color = Color(0.25, 0.22, 0.2, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="mat_ledge"]
+albedo_color = Color(0.35, 0.32, 0.28, 1)
+roughness = 0.75
+
+[sub_resource type="StandardMaterial3D" id="mat_glow"]
+albedo_color = Color(0.1, 0.4, 0.5, 1)
+emission_enabled = true
+emission = Color(0.1, 0.5, 0.6, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="BoxMesh" id="mesh_ledge"]
+size = Vector3(4, 0.5, 3)
+
+[sub_resource type="BoxMesh" id="mesh_platform_narrow"]
+size = Vector3(2, 0.4, 2)
+
+[sub_resource type="BoxMesh" id="mesh_pillar"]
+size = Vector3(2, 16, 2)
+
+[sub_resource type="BoxMesh" id="mesh_bridge"]
+size = Vector3(1.5, 0.3, 8)
+
+[sub_resource type="CylinderMesh" id="mesh_glow_crystal"]
+top_radius = 0.15
+bottom_radius = 0.4
+height = 1.2
+
+[sub_resource type="BoxShape3D" id="shape_ledge"]
+size = Vector3(4, 0.5, 3)
+
+[sub_resource type="BoxShape3D" id="shape_platform"]
+size = Vector3(2, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="shape_pillar"]
+size = Vector3(2, 16, 2)
+
+[sub_resource type="BoxShape3D" id="shape_bridge"]
+size = Vector3(1.5, 0.3, 8)
+
+[sub_resource type="BoxShape3D" id="shape_floor_bottom"]
+size = Vector3(30, 2, 30)
+
+[node name="RoomChasm" type="Node3D"]
+
+[node name="Entry" type="Marker3D" parent="." groups=["chunk_entry"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 20, 12)
+
+[node name="Exit" type="Marker3D" parent="." groups=["chunk_exit"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -8, -12)
+
+[node name="Walls" type="Node3D" parent="."]
+
+[node name="WallNorth" parent="Walls" instance=ExtResource("2_wall")]
+transform = Transform3D(2, 0, 0, 0, 4, 0, 0, 0, 1, 0, 6, -15)
+
+[node name="WallSouth" parent="Walls" instance=ExtResource("2_wall")]
+transform = Transform3D(2, 0, 0, 0, 4, 0, 0, 0, 1, 0, 6, 15)
+
+[node name="WallEast" parent="Walls" instance=ExtResource("2_wall")]
+transform = Transform3D(1, 0, 0, 0, 4, 0, 0, 0, 2, 15, 6, 0)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="WallWest" parent="Walls" instance=ExtResource("2_wall")]
+transform = Transform3D(1, 0, 0, 0, 4, 0, 0, 0, 2, -15, 6, 0)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="Pillar1" parent="Walls" instance=ExtResource("3_column")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 10, -12)
+
+[node name="Pillar2" parent="Walls" instance=ExtResource("3_column")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 10, 12)
+
+[node name="BottomFloor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -10, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BottomFloor"]
+shape = SubResource("shape_floor_bottom")
+
+[node name="FloorMesh" parent="BottomFloor" instance=ExtResource("1_floor")]
+transform = Transform3D(1.5, 0, 0, 0, 1, 0, 0, 0, 1.5, 0, 0, 0)
+
+[node name="Platforms" type="Node3D" parent="."]
+
+[node name="StartLedge" type="StaticBody3D" parent="Platforms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 18, 10)
+
+[node name="Mesh" type="MeshInstance3D" parent="Platforms/StartLedge"]
+mesh = SubResource("mesh_ledge")
+material_override = SubResource("mat_ledge")
+
+[node name="Collision" type="CollisionShape3D" parent="Platforms/StartLedge"]
+shape = SubResource("shape_ledge")
+
+[node name="MovingPlatform1" parent="Platforms" instance=ExtResource("4_platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 12, 5)
+move_to_vector = Vector3(0, 4, 0)
+speed = 2.5
+pause_time = 1.0
+
+[node name="MovingPlatform2" parent="Platforms" instance=ExtResource("4_platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 10, 0)
+move_to_vector = Vector3(0, 0, 6)
+speed = 3.0
+pause_time = 0.5
+
+[node name="Platform3" type="StaticBody3D" parent="Platforms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 6, -4)
+
+[node name="Mesh" type="MeshInstance3D" parent="Platforms/Platform3"]
+mesh = SubResource("mesh_platform_narrow")
+material_override = SubResource("mat_ledge")
+
+[node name="Collision" type="CollisionShape3D" parent="Platforms/Platform3"]
+shape = SubResource("shape_platform")
+
+[node name="Platform4" type="StaticBody3D" parent="Platforms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 2, -6)
+
+[node name="Mesh" type="MeshInstance3D" parent="Platforms/Platform4"]
+mesh = SubResource("mesh_platform_narrow")
+material_override = SubResource("mat_ledge")
+
+[node name="Collision" type="CollisionShape3D" parent="Platforms/Platform4"]
+shape = SubResource("shape_platform")
+
+[node name="ExitLedge" type="StaticBody3D" parent="Platforms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -6, -10)
+
+[node name="Mesh" type="MeshInstance3D" parent="Platforms/ExitLedge"]
+mesh = SubResource("mesh_ledge")
+material_override = SubResource("mat_ledge")
+
+[node name="Collision" type="CollisionShape3D" parent="Platforms/ExitLedge"]
+shape = SubResource("shape_ledge")
+
+[node name="CentralPillar" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="CentralPillar"]
+mesh = SubResource("mesh_pillar")
+material_override = SubResource("mat_rock")
+
+[node name="Collision" type="CollisionShape3D" parent="CentralPillar"]
+shape = SubResource("shape_pillar")
+
+[node name="NarrowBridge" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 10, 2)
+rotation_degrees = Vector3(0, 25, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="NarrowBridge"]
+mesh = SubResource("mesh_bridge")
+material_override = SubResource("mat_rock")
+
+[node name="Collision" type="CollisionShape3D" parent="NarrowBridge"]
+shape = SubResource("shape_bridge")
+
+[node name="GlowCrystals" type="Node3D" parent="."]
+
+[node name="Crystal1" type="MeshInstance3D" parent="GlowCrystals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 15, 8)
+rotation_degrees = Vector3(15, 0, -10)
+mesh = SubResource("mesh_glow_crystal")
+material_override = SubResource("mat_glow")
+
+[node name="Crystal2" type="MeshInstance3D" parent="GlowCrystals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 7, -3)
+rotation_degrees = Vector3(-10, 45, 5)
+mesh = SubResource("mesh_glow_crystal")
+material_override = SubResource("mat_glow")
+
+[node name="Crystal3" type="MeshInstance3D" parent="GlowCrystals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, -4, -8)
+rotation_degrees = Vector3(5, -30, 12)
+mesh = SubResource("mesh_glow_crystal")
+material_override = SubResource("mat_glow")
+
+[node name="Lighting" type="Node3D" parent="."]
+
+[node name="AmbientGlow" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0)
+light_color = Color(0.3, 0.5, 0.6, 1)
+light_energy = 0.8
+omni_range = 25.0
+
+[node name="DepthLight" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -6, 0)
+light_color = Color(0.2, 0.3, 0.5, 1)
+light_energy = 0.5
+omni_range = 20.0

@@ -74,11 +74,41 @@ func assemble_level() -> void:
 		for key in metadata.keys():
 			room.set_meta(key, metadata[key])
 		_attach_room_trigger(room, metadata)
+		
+		# Apply biome coloring
+		var depth = metadata.get("depth", 0)
+		_apply_biome_coloring(room, depth)
 
 		if exit_marker:
 			previous_exits[branch_index] = exit_marker
 			if room_id != "":
 				room_exit_map[room_id] = exit_marker
+
+func _apply_biome_coloring(room: Node, depth: int) -> void:
+	# Biome Colors
+	var surface_color = Color(0.8, 0.9, 1.0) # Cool White
+	var toxic_color = Color(0.2, 0.8, 0.4)   # Toxic Green
+	var crystal_color = Color(0.6, 0.2, 0.9) # Purple
+	var magma_color = Color(1.0, 0.4, 0.1)   # Orange/Red
+	
+	var target_color = surface_color
+	if depth >= 2 and depth < 4:
+		target_color = toxic_color
+	elif depth >= 4 and depth < 6:
+		target_color = crystal_color
+	elif depth >= 6:
+		target_color = magma_color
+		
+	# Find all lights recursively
+	_tint_lights_recursive(room, target_color)
+
+func _tint_lights_recursive(node: Node, color: Color) -> void:
+	if node is Light3D:
+		# Blend original color with target biome color
+		node.light_color = node.light_color.lerp(color, 0.6)
+	
+	for child in node.get_children():
+		_tint_lights_recursive(child, color)
 
 func _get_marker(room: Node, group_name: StringName) -> Marker3D:
 	if group_name.is_empty():

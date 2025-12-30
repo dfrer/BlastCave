@@ -12,9 +12,14 @@ enum RoomType { START, COMBAT, PUZZLE, SHOP, REWARD, BOSS, EXIT }
 
 @export var start_scene: PackedScene = preload("res://scenes/levels/room_01_intro.tscn")
 @export var combat_scene: PackedScene = preload("res://scenes/levels/room_02_traversal.tscn")
-@export var puzzle_scene: PackedScene = preload("res://scenes/levels/room_02_traversal.tscn")
-@export var shop_scene: PackedScene = preload("res://scenes/levels/room_02_traversal.tscn")
-@export var reward_scene: PackedScene = preload("res://scenes/levels/room_02_traversal.tscn")
+@export var puzzle_scene: PackedScene = preload("res://scenes/levels/room_07_puzzle_jump.tscn")
+@export var puzzle_scenes: Array[PackedScene] = [
+	preload("res://scenes/levels/room_05_chasm.tscn"),
+	preload("res://scenes/levels/room_07_puzzle_jump.tscn"),
+	preload("res://scenes/levels/room_08_bridge_puzzle.tscn")
+]
+@export var shop_scene: PackedScene = preload("res://scenes/levels/room_06_pivot.tscn")
+@export var reward_scene: PackedScene = preload("res://scenes/levels/room_06_pivot.tscn")
 @export var boss_scene: PackedScene = preload("res://scenes/levels/room_04_boss.tscn")
 @export var exit_scene: PackedScene = preload("res://scenes/levels/room_03_exit.tscn")
 
@@ -105,6 +110,8 @@ func _scene_for_type(room_type: int) -> PackedScene:
 		RoomType.COMBAT:
 			return combat_scene
 		RoomType.PUZZLE:
+			if not puzzle_scenes.is_empty():
+				return puzzle_scenes.pick_random()
 			return puzzle_scene
 		RoomType.SHOP:
 			return shop_scene

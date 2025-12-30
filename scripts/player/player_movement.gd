@@ -10,11 +10,25 @@ class_name PlayerMovement
 @export var ground_check_distance: float = 0.6
 @export var use_camera_relative: bool = true
 
+var _was_grounded: bool = true
+var _vertical_velocity_at_impact: float = 0.0
+
 func apply_movement(body: RigidBody3D, delta: float) -> void:
 	if not body:
 		return
 	var grounded = _is_grounded(body)
 	body.linear_damp = grounded_linear_damp if grounded else airborne_linear_damp
+
+	# Handle landing FX
+	if grounded and not _was_grounded:
+		var impact_speed = abs(_vertical_velocity_at_impact)
+		if impact_speed > 5.0:
+			FXHelper.spawn_dust(body, body.global_position)
+			FXHelper.screen_shake(body, impact_speed * 0.04)
+	
+	_was_grounded = grounded
+	if not grounded:
+		_vertical_velocity_at_impact = body.linear_velocity.y
 
 	var input_dir = _get_input_direction(body)
 	if input_dir != Vector3.ZERO:

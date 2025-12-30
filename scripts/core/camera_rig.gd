@@ -19,6 +19,12 @@ var _distance: float = 14.0
 var _dragging: bool = false
 var _settings: CameraSettingsState
 
+# Shake properties
+var _trauma: float = 0.0
+@export var trauma_reduction: float = 0.8
+@export var max_shake_offset: float = 0.5
+@export var max_shake_rotation: float = 0.1
+
 func _ready() -> void:
 	camera.current = true
 	_target = _resolve_target()
@@ -43,7 +49,32 @@ func _process(delta: float) -> void:
 	if not _target:
 		_target = _resolve_target()
 		return
+	
+	if _trauma > 0:
+		_trauma = max(_trauma - trauma_reduction * delta, 0.0)
+		_apply_shake()
+	else:
+		# Reset camera offsets when no trauma
+		camera.h_offset = 0
+		camera.v_offset = 0
+		camera.rotation.z = 0
+		
 	_update_transform(delta)
+
+func apply_trauma(amount: float) -> void:
+	_trauma = clampf(_trauma + amount, 0.0, 1.0)
+
+func _apply_shake() -> void:
+	var shake = _trauma * _trauma
+	var offset = Vector2(
+		randf_range(-1.0, 1.0) * max_shake_offset * shake,
+		randf_range(-1.0, 1.0) * max_shake_offset * shake
+	)
+	var rot = randf_range(-1.0, 1.0) * max_shake_rotation * shake
+	
+	camera.h_offset = offset.x
+	camera.v_offset = offset.y
+	camera.rotation.z = rot
 
 func _resolve_target() -> Node3D:
 	if target_path != NodePath():

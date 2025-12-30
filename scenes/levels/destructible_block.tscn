@@ -1,0 +1,28 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/levels/destructible_block.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/fx/debris_chunk.tscn" id="2_debris"]
+
+[sub_resource type="StandardMaterial3D" id="mat_block"]
+albedo_color = Color(0.6, 0.55, 0.5, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="mesh_block"]
+size = Vector3(2, 2, 2)
+
+[sub_resource type="BoxShape3D" id="shape_block"]
+size = Vector3(2, 2, 2)
+
+[node name="DestructibleBlock" type="RigidBody3D" groups=["blast_sensitive"]]
+mass = 5.0
+freeze = true
+script = ExtResource("1_script")
+health = 20.0
+debris_scene = ExtResource("2_debris")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("mesh_block")
+material_override = SubResource("mat_block")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("shape_block")

@@ -1,0 +1,176 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/kit/cave_floor.tscn" id="1_floor"]
+[ext_resource type="PackedScene" path="res://scenes/kit/cave_wall.tscn" id="2_wall"]
+
+[sub_resource type="StandardMaterial3D" id="mat_rock"]
+albedo_color = Color(0.28, 0.25, 0.22, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="mat_path_main"]
+albedo_color = Color(0.4, 0.38, 0.32, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="mat_path_branch"]
+albedo_color = Color(0.35, 0.32, 0.38, 1)
+roughness = 0.75
+
+[sub_resource type="StandardMaterial3D" id="mat_glow_warm"]
+albedo_color = Color(0.6, 0.4, 0.2, 1)
+emission_enabled = true
+emission = Color(0.7, 0.4, 0.15, 1)
+emission_energy_multiplier = 1.2
+
+[sub_resource type="StandardMaterial3D" id="mat_glow_cool"]
+albedo_color = Color(0.2, 0.4, 0.5, 1)
+emission_enabled = true
+emission = Color(0.15, 0.5, 0.6, 1)
+emission_energy_multiplier = 1.2
+
+[sub_resource type="BoxMesh" id="mesh_main_platform"]
+size = Vector3(6, 0.6, 6)
+
+[sub_resource type="BoxMesh" id="mesh_branch_path"]
+size = Vector3(3, 0.4, 8)
+
+[sub_resource type="BoxMesh" id="mesh_pillar_wide"]
+size = Vector3(3, 8, 3)
+
+[sub_resource type="CylinderMesh" id="mesh_marker"]
+top_radius = 0.3
+bottom_radius = 0.5
+height = 1.5
+
+[sub_resource type="BoxShape3D" id="shape_main"]
+size = Vector3(6, 0.6, 6)
+
+[sub_resource type="BoxShape3D" id="shape_branch"]
+size = Vector3(3, 0.4, 8)
+
+[sub_resource type="BoxShape3D" id="shape_pillar"]
+size = Vector3(3, 8, 3)
+
+[node name="RoomPivot" type="Node3D"]
+
+[node name="Entry" type="Marker3D" parent="." groups=["chunk_entry"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 12)
+
+[node name="ExitForward" type="Marker3D" parent="." groups=["chunk_exit"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -12)
+
+[node name="ExitBranch" type="Marker3D" parent="." groups=["chunk_exit_branch"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 4, 0)
+
+[node name="Walls" type="Node3D" parent="."]
+
+[node name="WallNorth" parent="Walls" instance=ExtResource("2_wall")]
+transform = Transform3D(1.2, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -14)
+
+[node name="WallSouth" parent="Walls" instance=ExtResource("2_wall")]
+transform = Transform3D(1.2, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 14)
+
+[node name="WallWest" parent="Walls" instance=ExtResource("2_wall")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1.2, -14, 3, 0)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="Floor" parent="." instance=ExtResource("1_floor")]
+transform = Transform3D(1.4, 0, 0, 0, 1, 0, 0, 0, 1.4, 0, 0, 0)
+
+[node name="CentralHub" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="CentralHub"]
+mesh = SubResource("mesh_main_platform")
+material_override = SubResource("mat_path_main")
+
+[node name="Collision" type="CollisionShape3D" parent="CentralHub"]
+shape = SubResource("shape_main")
+
+[node name="MainPathForward" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, -7)
+
+[node name="Mesh" type="MeshInstance3D" parent="MainPathForward"]
+mesh = SubResource("mesh_branch_path")
+material_override = SubResource("mat_path_main")
+
+[node name="Collision" type="CollisionShape3D" parent="MainPathForward"]
+shape = SubResource("shape_branch")
+
+[node name="MainPathBack" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 7)
+
+[node name="Mesh" type="MeshInstance3D" parent="MainPathBack"]
+mesh = SubResource("mesh_branch_path")
+material_override = SubResource("mat_path_main")
+
+[node name="Collision" type="CollisionShape3D" parent="MainPathBack"]
+shape = SubResource("shape_branch")
+
+[node name="BranchPath" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 2.5, 0)
+rotation_degrees = Vector3(0, 90, 8)
+
+[node name="Mesh" type="MeshInstance3D" parent="BranchPath"]
+mesh = SubResource("mesh_branch_path")
+material_override = SubResource("mat_path_branch")
+
+[node name="Collision" type="CollisionShape3D" parent="BranchPath"]
+shape = SubResource("shape_branch")
+
+[node name="BranchRamp" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 2, 0)
+rotation_degrees = Vector3(0, 90, 15)
+
+[node name="Mesh" type="MeshInstance3D" parent="BranchRamp"]
+mesh = SubResource("mesh_branch_path")
+scale = Vector3(0.8, 1, 0.6)
+material_override = SubResource("mat_path_branch")
+
+[node name="Collision" type="CollisionShape3D" parent="BranchRamp"]
+shape = SubResource("shape_branch")
+
+[node name="Pillar1" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 4, -5)
+
+[node name="Mesh" type="MeshInstance3D" parent="Pillar1"]
+mesh = SubResource("mesh_pillar_wide")
+material_override = SubResource("mat_rock")
+
+[node name="Collision" type="CollisionShape3D" parent="Pillar1"]
+shape = SubResource("shape_pillar")
+
+[node name="Pillar2" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 4, 5)
+
+[node name="Mesh" type="MeshInstance3D" parent="Pillar2"]
+mesh = SubResource("mesh_pillar_wide")
+material_override = SubResource("mat_rock")
+
+[node name="Collision" type="CollisionShape3D" parent="Pillar2"]
+shape = SubResource("shape_pillar")
+
+[node name="PathMarkers" type="Node3D" parent="."]
+
+[node name="MainMarker" type="MeshInstance3D" parent="PathMarkers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -4)
+mesh = SubResource("mesh_marker")
+material_override = SubResource("mat_glow_warm")
+
+[node name="BranchMarker" type="MeshInstance3D" parent="PathMarkers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 3.5, 0)
+mesh = SubResource("mesh_marker")
+material_override = SubResource("mat_glow_cool")
+
+[node name="Lighting" type="Node3D" parent="."]
+
+[node name="HubLight" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
+light_color = Color(0.9, 0.8, 0.7, 1)
+light_energy = 0.7
+omni_range = 12.0
+
+[node name="BranchLight" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 5, 0)
+light_color = Color(0.5, 0.7, 0.8, 1)
+light_energy = 0.5
+omni_range = 8.0

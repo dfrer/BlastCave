@@ -11,3 +11,9 @@ res://scripts/core/room_trigger.gd
 res://scripts/ui/game_over_screen.gd
 res://scripts/ui/level_complete_screen.gd
 res://scripts/ui/main_menu.gd
+res://scripts/core/test_input.gd
+res://scripts/core/cave_generator.gd
+res://scripts/core/level_assembler.gd
+res://scripts/core/camera_rig.gd
+res://scripts/core/fx_helper.gd
+res://scenes/levels/room_05_chasm.tscn

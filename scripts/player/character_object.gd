@@ -22,6 +22,20 @@ var _gyro_active_remaining: float = 0.0
 var characters_data: Dictionary = {}
 var movement_controller: PlayerMovement
 
+# Look-at system
+var _head_pivot: Node3D
+var _look_target: Vector3 = Vector3.ZERO
+var _has_look_target: bool = false
+@export var look_speed: float = 8.0
+
+# Eye feedback system
+var _eye_main: MeshInstance3D
+var _explosive_colors: Dictionary = {
+	"ImpulseCharge": Color(0.1, 0.9, 0.6),
+	"ShapedCharge": Color(0.95, 0.8, 0.1),
+	"DelayedCharge": Color(0.9, 0.2, 0.8)
+}
+
 func _ready():
 	_load_characters()
 	# Optional: Set default if not set by run_start
@@ -31,6 +45,11 @@ func _ready():
 		movement_controller = PlayerMovement.new()
 		movement_controller.name = "PlayerMovement"
 		add_child(movement_controller)
+	# Find HeadPivot for look-at
+	_head_pivot = get_node_or_null("HeadPivot")
+	# Find EyeMain for color feedback
+	if _head_pivot:
+		_eye_main = _head_pivot.get_node_or_null("EyeMain") as MeshInstance3D
 
 func _load_characters():
 	var file = FileAccess.open("res://data/characters.json", FileAccess.READ)
@@ -115,6 +134,9 @@ func _physics_process(delta):
 		pin()
 	elif ability == "gyro_stabilize" and Input.is_action_just_pressed("ability_activate") and ability_cooldown_remaining <= 0.0:
 		_trigger_gyro_stabilize()
+	
+	# Look-at logic
+	_update_head_look(delta)
 
 func pin():
 	is_pinned = true
@@ -149,3 +171,41 @@ func apply_ability_cooldown_multiplier(multiplier: float) -> void:
 		return
 	ability_cooldown = _base_ability_cooldown * multiplier
 	_emit_ability_state()
+
+# --- Look-at System ---
+func set_look_target(target_pos: Vector3) -> void:
+	_look_target = target_pos
+	_has_look_target = true
+
+func clear_look_target() -> void:
+	_has_look_target = false
+
+func _update_head_look(delta: float) -> void:
+	if not _head_pivot or not _has_look_target:
+		return
+	# Calculate direction from head to target in local space of the RigidBody
+	var head_global_pos = _head_pivot.global_position
+	var direction = (_look_target - head_global_pos).normalized()
+	if direction.length_squared() < 0.001:
+		return
+	# Convert to local space for rotation
+	var local_dir = global_transform.basis.inverse() * direction
+	# Calculate target rotation (only Y-axis yaw, limited X-axis pitch)
+	var target_yaw = atan2(local_dir.x, local_dir.z)
+	var target_pitch = -asin(clampf(local_dir.y, -0.8, 0.8))
+	# Smooth interpolation
+	var current_rot = _head_pivot.rotation
+	_head_pivot.rotation.y = lerp_angle(current_rot.y, target_yaw, look_speed * delta)
+	_head_pivot.rotation.x = lerp(current_rot.x, target_pitch, look_speed * delta)
+
+# --- Eye Feedback System ---
+func set_explosive_type(type_name: String) -> void:
+	if not _eye_main:
+		return
+	var color = _explosive_colors.get(type_name, Color(0.1, 0.9, 0.6))
+	var mat = _eye_main.get_active_material(0)
+	if mat is StandardMaterial3D:
+		mat = mat.duplicate()
+		mat.albedo_color = color
+		mat.emission = color
+		_eye_main.material_override = mat

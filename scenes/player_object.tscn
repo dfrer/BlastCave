@@ -1,29 +1,93 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://scripts/player/character_object.gd" id="1_script"]
 [ext_resource type="Script" path="res://scripts/core/health_component.gd" id="2_health"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_p"]
-albedo_color = Color(0.8, 0.2, 0.2, 1)
+[sub_resource type="StandardMaterial3D" id="mat_body"]
+albedo_color = Color(0.3, 0.35, 0.4, 1)
+metallic = 0.6
+roughness = 0.4
 
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_p"]
-height = 1.2
+[sub_resource type="StandardMaterial3D" id="mat_head"]
+albedo_color = Color(0.45, 0.5, 0.55, 1)
+metallic = 0.5
+roughness = 0.35
+
+[sub_resource type="StandardMaterial3D" id="mat_eye"]
+albedo_color = Color(0.1, 0.9, 0.6, 1)
+emission_enabled = true
+emission = Color(0.1, 0.9, 0.6, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="StandardMaterial3D" id="mat_eye_secondary"]
+albedo_color = Color(0.9, 0.5, 0.1, 1)
+emission_enabled = true
+emission = Color(0.9, 0.5, 0.1, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="CapsuleMesh" id="mesh_body"]
+height = 0.9
+radius = 0.35
+
+[sub_resource type="SphereMesh" id="mesh_head"]
+radius = 0.3
+height = 0.6
+
+[sub_resource type="SphereMesh" id="mesh_eye_main"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="SphereMesh" id="mesh_eye_small"]
+radius = 0.05
+height = 0.1
+
+[sub_resource type="CapsuleShape3D" id="collision_shape"]
+height = 1.5
 radius = 0.4
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_p"]
-height = 1.2
-radius = 0.4
+[sub_resource type="BoxMesh" id="mesh_visor"]
+size = Vector3(0.5, 0.12, 0.15)
 
 [node name="PlayerObject" type="RigidBody3D"]
 mass = 1.0
 script = ExtResource("1_script")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-shape = SubResource("CapsuleShape3D_p")
+shape = SubResource("collision_shape")
 
-[node name="Mesh" type="MeshInstance3D" parent="."]
-mesh = SubResource("CapsuleMesh_p")
-material_override = SubResource("StandardMaterial3D_p")
+[node name="BodyPivot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, 0)
+
+[node name="Torso" type="MeshInstance3D" parent="BodyPivot"]
+mesh = SubResource("mesh_body")
+material_override = SubResource("mat_body")
+
+[node name="HeadPivot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+
+[node name="Head" type="MeshInstance3D" parent="HeadPivot"]
+mesh = SubResource("mesh_head")
+material_override = SubResource("mat_head")
+
+[node name="Visor" type="MeshInstance3D" parent="HeadPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0.22)
+mesh = SubResource("mesh_visor")
+material_override = SubResource("mat_body")
+
+[node name="EyeMain" type="MeshInstance3D" parent="HeadPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0.28)
+mesh = SubResource("mesh_eye_main")
+material_override = SubResource("mat_eye")
+
+[node name="EyeLeft" type="MeshInstance3D" parent="HeadPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15, 0.08, 0.25)
+mesh = SubResource("mesh_eye_small")
+material_override = SubResource("mat_eye_secondary")
+
+[node name="EyeRight" type="MeshInstance3D" parent="HeadPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, 0.08, 0.25)
+mesh = SubResource("mesh_eye_small")
+material_override = SubResource("mat_eye_secondary")
 
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("2_health")

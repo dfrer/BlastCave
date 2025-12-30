@@ -1,0 +1,106 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/kit/cave_floor.tscn" id="1_floor"]
+[ext_resource type="PackedScene" path="res://scenes/kit/cave_wall.tscn" id="2_wall"]
+[ext_resource type="PackedScene" path="res://scenes/levels/destructible_block.tscn" id="3_block"]
+[ext_resource type="PackedScene" path="res://scenes/kit/cave_column.tscn" id="4_column"]
+
+[sub_resource type="StandardMaterial3D" id="mat_rock"]
+albedo_color = Color(0.3, 0.28, 0.25, 1)
+roughness = 0.85
+
+[sub_resource type="BoxMesh" id="mesh_platform"]
+size = Vector3(4, 0.5, 4)
+
+[sub_resource type="BoxShape3D" id="shape_platform"]
+size = Vector3(4, 0.5, 4)
+
+[sub_resource type="BoxMesh" id="mesh_marker"]
+size = Vector3(0.5, 2, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="mat_marker"]
+albedo_color = Color(0.9, 0.8, 0.2, 1)
+emission_enabled = true
+emission = Color(0.9, 0.8, 0.2, 1)
+
+[node name="RoomPuzzleJump" type="Node3D"]
+
+[node name="Entry" type="Marker3D" parent="." groups=["chunk_entry"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 12)
+
+[node name="Exit" type="Marker3D" parent="." groups=["chunk_exit"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14, -12)
+
+[node name="Walls" type="Node3D" parent="."]
+
+[node name="WallNorth" parent="Walls" instance=ExtResource("2_wall")]
+transform = Transform3D(1.5, 0, 0, 0, 2, 0, 0, 0, 1, 0, 8, -14)
+
+[node name="WallSouth" parent="Walls" instance=ExtResource("2_wall")]
+transform = Transform3D(1.5, 0, 0, 0, 2, 0, 0, 0, 1, 0, 8, 14)
+
+[node name="WallEast" parent="Walls" instance=ExtResource("2_wall")]
+transform = Transform3D(1, 0, 0, 0, 2, 0, 0, 0, 1.5, 14, 8, 0)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="WallWest" parent="Walls" instance=ExtResource("2_wall")]
+transform = Transform3D(1, 0, 0, 0, 2, 0, 0, 0, 1.5, -14, 8, 0)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="Floor" parent="." instance=ExtResource("1_floor")]
+transform = Transform3D(1.5, 0, 0, 0, 1, 0, 0, 0, 1.5, 0, 0, 0)
+
+[node name="Platforms" type="Node3D" parent="."]
+
+[node name="HighPlatform" type="StaticBody3D" parent="Platforms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12, -8)
+
+[node name="Mesh" type="MeshInstance3D" parent="Platforms/HighPlatform"]
+mesh = SubResource("mesh_platform")
+material_override = SubResource("mat_rock")
+
+[node name="Collision" type="CollisionShape3D" parent="Platforms/HighPlatform"]
+shape = SubResource("shape_platform")
+
+[node name="DestructibleCeiling" type="Node3D" parent="."]
+
+[node name="Block1" parent="DestructibleCeiling" instance=ExtResource("3_block")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, -8)
+
+[node name="Block2" parent="DestructibleCeiling" instance=ExtResource("3_block")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 8, -8)
+
+[node name="Block3" parent="DestructibleCeiling" instance=ExtResource("3_block")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 8, -8)
+
+[node name="Block4" parent="DestructibleCeiling" instance=ExtResource("3_block")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, -6)
+
+[node name="Block5" parent="DestructibleCeiling" instance=ExtResource("3_block")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, -10)
+
+[node name="HintMarker" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -8)
+mesh = SubResource("mesh_marker")
+material_override = SubResource("mat_marker")
+
+[node name="Label3D" type="Label3D" parent="HintMarker"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+billboard = 1
+text = "BLAST UP!"
+font_size = 48
+outline_size = 12
+
+[node name="Lighting" type="Node3D" parent="."]
+
+[node name="OmniLight3D" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, -8)
+light_color = Color(1, 0.8, 0.4, 1)
+light_energy = 0.8
+omni_range = 15.0
+
+[node name="OmniLight3D2" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 10)
+light_color = Color(0.2, 0.3, 0.5, 1)
+light_energy = 0.5
+omni_range = 15.0
