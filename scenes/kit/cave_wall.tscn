@@ -4,10 +4,10 @@
 albedo_color = Color(0.17, 0.18, 0.2, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_1"]
-size = Vector3(20, 4, 1)
+size = Vector3(24, 10, 1.5)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_1"]
-size = Vector3(20, 4, 1)
+size = Vector3(24, 10, 1.5)
 
 [node name="CaveWall" type="Node3D"]
 

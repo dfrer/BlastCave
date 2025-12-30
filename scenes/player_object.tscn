@@ -25,67 +25,68 @@ emission_enabled = true
 emission = Color(0.9, 0.5, 0.1, 1)
 emission_energy_multiplier = 1.5
 
-[sub_resource type="CapsuleMesh" id="mesh_body"]
-height = 0.9
-radius = 0.35
-
-[sub_resource type="SphereMesh" id="mesh_head"]
-radius = 0.3
-height = 0.6
+[sub_resource type="SphereMesh" id="mesh_body"]
+radius = 0.5
+height = 1.0
+radial_segments = 32
+rings = 16
 
 [sub_resource type="SphereMesh" id="mesh_eye_main"]
-radius = 0.1
-height = 0.2
+radius = 0.12
+height = 0.24
 
 [sub_resource type="SphereMesh" id="mesh_eye_small"]
-radius = 0.05
-height = 0.1
+radius = 0.06
+height = 0.12
 
-[sub_resource type="CapsuleShape3D" id="collision_shape"]
-height = 1.5
-radius = 0.4
+[sub_resource type="SphereShape3D" id="collision_shape"]
+radius = 0.5
 
 [sub_resource type="BoxMesh" id="mesh_visor"]
-size = Vector3(0.5, 0.12, 0.15)
+size = Vector3(0.4, 0.1, 0.12)
+
+[sub_resource type="PhysicsMaterial" id="physics_mat"]
+friction = 0.3
+bounce = 0.4
 
 [node name="PlayerObject" type="RigidBody3D"]
 mass = 1.0
+physics_material_override = SubResource("physics_mat")
+continuous_cd = true
+contact_monitor = true
+max_contacts_reported = 4
 script = ExtResource("1_script")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("collision_shape")
 
-[node name="BodyPivot" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, 0)
-
-[node name="Torso" type="MeshInstance3D" parent="BodyPivot"]
+[node name="BodyMesh" type="MeshInstance3D" parent="."]
 mesh = SubResource("mesh_body")
 material_override = SubResource("mat_body")
 
-[node name="HeadPivot" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+[node name="FacePivot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
 
-[node name="Head" type="MeshInstance3D" parent="HeadPivot"]
-mesh = SubResource("mesh_head")
+[node name="Visor" type="MeshInstance3D" parent="FacePivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0.42)
+mesh = SubResource("mesh_visor")
 material_override = SubResource("mat_head")
 
-[node name="Visor" type="MeshInstance3D" parent="HeadPivot"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0.22)
-mesh = SubResource("mesh_visor")
-material_override = SubResource("mat_body")
+[node name="HeadPivot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
 
 [node name="EyeMain" type="MeshInstance3D" parent="HeadPivot"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0.28)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0.48)
 mesh = SubResource("mesh_eye_main")
 material_override = SubResource("mat_eye")
 
 [node name="EyeLeft" type="MeshInstance3D" parent="HeadPivot"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15, 0.08, 0.25)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.15, 0.44)
 mesh = SubResource("mesh_eye_small")
 material_override = SubResource("mat_eye_secondary")
 
 [node name="EyeRight" type="MeshInstance3D" parent="HeadPivot"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, 0.08, 0.25)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.15, 0.44)
 mesh = SubResource("mesh_eye_small")
 material_override = SubResource("mat_eye_secondary")
 

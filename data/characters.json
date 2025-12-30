@@ -1,77 +1,115 @@
 {
   "core": {
     "display_name": "Core Prototype",
+    "description": "Balanced roller with good blast response",
     "mass": 1.0,
-    "friction": 0.5,
-    "linear_damp": 0.1,
-    "angular_damp": 0.1,
-    "blast_response": 1.0,
-    "ability": "none",
+    "friction": 0.3,
+    "linear_damp": 0.05,
+    "angular_damp": 0.05,
+    "blast_response": 1.2,
+    "ability": "blast_absorb",
     "ability_config": {
-      "label": "No Ability",
+      "label": "Blast Absorb",
+      "description": "Passive: Recover health when hit by your own explosions",
       "cooldown": 0.0,
       "duration": 0.0,
-      "power": 1.0
-    }
+      "power": 0.2,
+      "passive": true
+    },
+    "color": [
+      0.3,
+      0.8,
+      0.5
+    ]
   },
   "slug": {
     "display_name": "Heavy Slug",
-    "mass": 3.0,
-    "friction": 0.8,
-    "linear_damp": 0.5,
-    "angular_damp": 0.5,
-    "blast_response": 0.6,
-    "ability": "none",
+    "description": "Hard to launch but very stable rolling",
+    "mass": 2.5,
+    "friction": 0.5,
+    "linear_damp": 0.15,
+    "angular_damp": 0.15,
+    "blast_response": 0.7,
+    "ability": "ground_pound",
     "ability_config": {
-      "label": "No Ability",
-      "cooldown": 0.0,
+      "label": "Ground Pound",
+      "description": "Slam down with crushing force, damaging nearby enemies",
+      "cooldown": 5.0,
       "duration": 0.0,
-      "power": 1.0
-    }
+      "power": 10.0,
+      "radius": 5.0
+    },
+    "color": [
+      0.6,
+      0.4,
+      0.2
+    ]
   },
   "shard": {
     "display_name": "Fragile Shard",
-    "mass": 0.4,
-    "friction": 0.2,
+    "description": "Very bouncy and fast, hard to control",
+    "mass": 0.5,
+    "friction": 0.15,
     "linear_damp": 0.0,
     "angular_damp": 0.0,
-    "blast_response": 1.5,
-    "ability": "none",
+    "blast_response": 1.8,
+    "ability": "air_dash",
     "ability_config": {
-      "label": "No Ability",
-      "cooldown": 0.0,
-      "duration": 0.0,
-      "power": 1.0
-    }
+      "label": "Air Dash",
+      "description": "Quick horizontal burst of speed in any direction",
+      "cooldown": 1.5,
+      "duration": 0.12,
+      "power": 18.0
+    },
+    "color": [
+      0.8,
+      0.2,
+      0.6
+    ]
   },
   "anchor": {
     "display_name": "Iron Anchor",
+    "description": "Controllable, can stop on demand",
     "mass": 2.0,
-    "friction": 0.6,
-    "linear_damp": 0.2,
-    "angular_damp": 0.2,
+    "friction": 0.45,
+    "linear_damp": 0.1,
+    "angular_damp": 0.1,
     "blast_response": 0.8,
     "ability": "anchor_pin",
     "ability_config": {
       "label": "Anchor Pin",
-      "cooldown": 6.0,
-      "duration": 2.5,
+      "description": "Lock in place, becoming immune to knockback",
+      "cooldown": 5.0,
+      "duration": 3.0,
       "power": 1.0
-    }
+    },
+    "color": [
+      0.5,
+      0.5,
+      0.6
+    ]
   },
   "gyro": {
     "display_name": "Gyro Stabilizer",
+    "description": "Best control over rolling and spinning",
     "mass": 1.0,
-    "friction": 0.5,
-    "linear_damp": 0.1,
-    "angular_damp": 0.1,
+    "friction": 0.35,
+    "linear_damp": 0.05,
+    "angular_damp": 0.02,
     "blast_response": 1.0,
-    "ability": "gyro_stabilize",
+    "ability": "spin_transfer",
     "ability_config": {
-      "label": "Gyro Stabilize",
-      "cooldown": 4.5,
-      "duration": 1.5,
-      "power": 1.2
-    }
+      "label": "Spin Transfer",
+      "description": "Convert angular momentum into linear velocity boost",
+      "cooldown": 3.0,
+      "duration": 0.0,
+      "power": 2.0,
+      "angular_to_linear": 1.0
+    },
+    "color": [
+      0.2,
+      0.6,
+      0.9
+    ]
   }
 }

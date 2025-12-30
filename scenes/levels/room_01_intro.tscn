@@ -1,35 +1,287 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=21 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/kit/cave_floor.tscn" id="1_floor"]
-[ext_resource type="PackedScene" path="res://scenes/kit/cave_wall.tscn" id="2_wall"]
-[ext_resource type="PackedScene" path="res://scenes/kit/cave_column.tscn" id="3_column"]
+[ext_resource type="PackedScene" path="res://scenes/kit/cave_ramp.tscn" id="2_ramp"]
+[ext_resource type="PackedScene" path="res://scenes/pickup_explosive.tscn" id="3_pickup"]
+[ext_resource type="PackedScene" path="res://scenes/kit/bounce_pad.tscn" id="4_bounce"]
+[ext_resource type="PackedScene" path="res://scenes/kit/bouncy_surface.tscn" id="5_bouncy"]
+[ext_resource type="PackedScene" path="res://scenes/kit/cave_wall.tscn" id="6_wall"]
+
+[sub_resource type="StandardMaterial3D" id="mat_bowl"]
+albedo_color = Color(0.28, 0.26, 0.24, 1)
+roughness = 0.85
+metallic = 0.05
+
+[sub_resource type="StandardMaterial3D" id="mat_crystal_glow"]
+albedo_color = Color(0.1, 0.4, 0.5, 1)
+emission_enabled = true
+emission = Color(0.15, 0.6, 0.7, 1)
+emission_energy_multiplier = 2.0
+roughness = 0.2
+
+[sub_resource type="StandardMaterial3D" id="mat_exit_glow"]
+albedo_color = Color(0.1, 0.8, 0.4, 1)
+emission_enabled = true
+emission = Color(0.2, 0.9, 0.5, 1)
+emission_energy_multiplier = 2.5
+roughness = 0.3
+
+[sub_resource type="StandardMaterial3D" id="mat_path_glow"]
+albedo_color = Color(0.2, 0.6, 0.3, 1)
+emission_enabled = true
+emission = Color(0.3, 0.8, 0.4, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="CylinderMesh" id="mesh_crystal"]
+top_radius = 0.1
+bottom_radius = 0.35
+height = 1.4
+
+[sub_resource type="SphereMesh" id="mesh_exit_beacon"]
+radius = 0.4
+height = 0.8
+
+[sub_resource type="CylinderMesh" id="mesh_bowl_floor"]
+top_radius = 16.0
+bottom_radius = 15.0
+height = 2.0
+
+[sub_resource type="CylinderShape3D" id="shape_bowl_floor"]
+radius = 16.0
+height = 2.0
+
+[sub_resource type="BoxMesh" id="mesh_tunnel"]
+size = Vector3(10, 5, 10)
+
+[sub_resource type="BoxShape3D" id="shape_tunnel_floor"]
+size = Vector3(10, 2, 10)
+
+[sub_resource type="BoxMesh" id="mesh_guide_strip"]
+size = Vector3(2.5, 0.1, 8)
+
+[sub_resource type="PhysicsMaterial" id="physics_smooth"]
+friction = 0.2
+bounce = 0.3
+
+[sub_resource type="CylinderMesh" id="mesh_bowl_rim"]
+top_radius = 17.0
+bottom_radius = 16.5
+height = 1.0
+
+[sub_resource type="CylinderShape3D" id="shape_bowl_rim"]
+radius = 16.8
+height = 1.0
 
 [node name="Room01Intro" type="Node3D"]
 
-[node name="Floor" parent="." instance=ExtResource("1_floor")]
-
-[node name="WallNorth" parent="." instance=ExtResource("2_wall")]
-position = Vector3(0, 2, -9.5)
-
-[node name="WallSouth" parent="." instance=ExtResource("2_wall")]
-position = Vector3(0, 2, 9.5)
-
-[node name="WallEast" parent="." instance=ExtResource("2_wall")]
-position = Vector3(9.5, 2, 0)
-rotation_degrees = Vector3(0, 90, 0)
-
-[node name="WallWest" parent="." instance=ExtResource("2_wall")]
-position = Vector3(-9.5, 2, 0)
-rotation_degrees = Vector3(0, 90, 0)
-
-[node name="ColumnA" parent="." instance=ExtResource("3_column")]
-position = Vector3(-6, 2, -6)
-
-[node name="ColumnB" parent="." instance=ExtResource("3_column")]
-position = Vector3(6, 2, 6)
-
 [node name="Entry" type="Marker3D" parent="." groups=["chunk_entry"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 7)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
 
 [node name="Exit" type="Marker3D" parent="." groups=["chunk_exit"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -10)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2, -22)
+
+[node name="Geometry" type="Node3D" parent="."]
+
+[node name="BowlFloor" type="StaticBody3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+physics_material_override = SubResource("physics_smooth")
+
+[node name="Mesh" type="MeshInstance3D" parent="Geometry/BowlFloor"]
+mesh = SubResource("mesh_bowl_floor")
+material_override = SubResource("mat_bowl")
+
+[node name="Collision" type="CollisionShape3D" parent="Geometry/BowlFloor"]
+shape = SubResource("shape_bowl_floor")
+
+[node name="BowlRim" type="StaticBody3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+
+[node name="RimMesh" type="MeshInstance3D" parent="Geometry/BowlRim"]
+mesh = SubResource("mesh_bowl_rim")
+material_override = SubResource("mat_bowl")
+
+[node name="RimCollision" type="CollisionShape3D" parent="Geometry/BowlRim"]
+shape = SubResource("shape_bowl_rim")
+
+[node name="WallNorth" parent="Geometry" instance=ExtResource("6_wall")]
+transform = Transform3D(1.2, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, -18)
+
+[node name="WallEast" parent="Geometry" instance=ExtResource("6_wall")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 4, 0)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="WallWest" parent="Geometry" instance=ExtResource("6_wall")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 4, 0)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="WallSouth" parent="Geometry" instance=ExtResource("6_wall")]
+transform = Transform3D(1.2, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 16)
+
+[node name="RampToExit" parent="Geometry" instance=ExtResource("2_ramp")]
+transform = Transform3D(2.5, 0, 0, 0, 0.866025, -0.5, 0, 0.5, 0.866025, 0, -1, -10)
+
+[node name="RampLeft" parent="Geometry" instance=ExtResource("2_ramp")]
+transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, -8, 0, -5)
+rotation_degrees = Vector3(15, 30, 0)
+
+[node name="RampRight" parent="Geometry" instance=ExtResource("2_ramp")]
+transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, 8, 0, -5)
+rotation_degrees = Vector3(15, -30, 0)
+
+[node name="ExitTunnel" type="StaticBody3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2, -18)
+physics_material_override = SubResource("physics_smooth")
+
+[node name="FloorMesh" type="MeshInstance3D" parent="Geometry/ExitTunnel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.5, 0)
+mesh = SubResource("mesh_tunnel")
+material_override = SubResource("mat_bowl")
+
+[node name="FloorCollision" type="CollisionShape3D" parent="Geometry/ExitTunnel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.5, 0)
+shape = SubResource("shape_tunnel_floor")
+
+[node name="TunnelWallLeft" parent="Geometry" instance=ExtResource("6_wall")]
+transform = Transform3D(0.4, 0, 0, 0, 0.6, 0, 0, 0, 0.5, -5, 0, -18)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="TunnelWallRight" parent="Geometry" instance=ExtResource("6_wall")]
+transform = Transform3D(0.4, 0, 0, 0, 0.6, 0, 0, 0, 0.5, 5, 0, -18)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="PathGuide1" type="MeshInstance3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, -4)
+mesh = SubResource("mesh_guide_strip")
+material_override = SubResource("mat_path_glow")
+
+[node name="PathGuide2" type="MeshInstance3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.4, -10)
+mesh = SubResource("mesh_guide_strip")
+material_override = SubResource("mat_path_glow")
+
+[node name="BouncePads" type="Node3D" parent="."]
+
+[node name="BouncePad1" parent="BouncePads" instance=ExtResource("4_bounce")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.2, 4)
+
+[node name="BouncePad2" parent="BouncePads" instance=ExtResource("4_bounce")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.2, 4)
+
+[node name="BouncePad3" parent="BouncePads" instance=ExtResource("4_bounce")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 8)
+
+[node name="BouncyWallLeft" parent="BouncePads" instance=ExtResource("5_bouncy")]
+transform = Transform3D(0.258819, 0, 0.965926, 0, 1, 0, -0.965926, 0, 0.258819, -12, 1, 0)
+scale = Vector3(0.3, 3, 2)
+
+[node name="BouncyWallRight" parent="BouncePads" instance=ExtResource("5_bouncy")]
+transform = Transform3D(0.258819, 0, -0.965926, 0, 1, 0, 0.965926, 0, 0.258819, 12, 1, 0)
+scale = Vector3(0.3, 3, 2)
+
+[node name="Pickups" type="Node3D" parent="."]
+
+[node name="Pickup1" parent="Pickups" instance=ExtResource("3_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.5, 3)
+explosive_type = "ImpulseCharge"
+amount = 3
+
+[node name="Pickup2" parent="Pickups" instance=ExtResource("3_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.5, 3)
+explosive_type = "ImpulseCharge"
+amount = 3
+
+[node name="Pickup3" parent="Pickups" instance=ExtResource("3_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 7)
+explosive_type = "ImpulseCharge"
+amount = 2
+
+[node name="Pickup4" parent="Pickups" instance=ExtResource("3_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0.5, -3)
+explosive_type = "ShapedCharge"
+amount = 2
+
+[node name="Pickup5" parent="Pickups" instance=ExtResource("3_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0.5, -3)
+explosive_type = "ShapedCharge"
+amount = 2
+
+[node name="Pickup6" parent="Pickups" instance=ExtResource("3_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.3, -8)
+explosive_type = "DelayedCharge"
+amount = 2
+
+[node name="Pickup7" parent="Pickups" instance=ExtResource("3_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.3, -8)
+explosive_type = "DelayedCharge"
+amount = 2
+
+[node name="PickupTunnel" parent="Pickups" instance=ExtResource("3_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.5, -18)
+explosive_type = "ImpulseCharge"
+amount = 2
+
+[node name="Decoration" type="Node3D" parent="."]
+
+[node name="Crystal1" type="MeshInstance3D" parent="Decoration"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.7, 6)
+rotation_degrees = Vector3(10, 0, -8)
+mesh = SubResource("mesh_crystal")
+material_override = SubResource("mat_crystal_glow")
+
+[node name="Crystal2" type="MeshInstance3D" parent="Decoration"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0.7, 6)
+rotation_degrees = Vector3(-5, 45, 12)
+mesh = SubResource("mesh_crystal")
+material_override = SubResource("mat_crystal_glow")
+
+[node name="Crystal3" type="MeshInstance3D" parent="Decoration"]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, -9, 0.5, -6)
+rotation_degrees = Vector3(8, -30, 5)
+mesh = SubResource("mesh_crystal")
+material_override = SubResource("mat_crystal_glow")
+
+[node name="Crystal4" type="MeshInstance3D" parent="Decoration"]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 9, 0.5, -6)
+rotation_degrees = Vector3(-8, 60, -5)
+mesh = SubResource("mesh_crystal")
+material_override = SubResource("mat_crystal_glow")
+
+[node name="ExitBeacon" type="MeshInstance3D" parent="Decoration"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.8, -22)
+mesh = SubResource("mesh_exit_beacon")
+material_override = SubResource("mat_exit_glow")
+
+[node name="Lighting" type="Node3D" parent="."]
+
+[node name="AmbientFill" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0)
+light_color = Color(0.7, 0.75, 0.85, 1)
+light_energy = 0.8
+omni_range = 30.0
+omni_attenuation = 1.5
+
+[node name="KeyLight" type="SpotLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 6, 12, 6)
+light_color = Color(1, 0.95, 0.85, 1)
+light_energy = 1.5
+spot_range = 35.0
+spot_angle = 50.0
+spot_angle_attenuation = 0.8
+
+[node name="ExitHighlight" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -18)
+light_color = Color(0.3, 0.9, 0.5, 1)
+light_energy = 1.5
+omni_range = 12.0
+
+[node name="PathLight1" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -5)
+light_color = Color(0.4, 0.9, 0.5, 1)
+light_energy = 0.6
+omni_range = 8.0
+
+[node name="PathLight2" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -12)
+light_color = Color(0.4, 0.9, 0.5, 1)
+light_energy = 0.6
+omni_range = 8.0

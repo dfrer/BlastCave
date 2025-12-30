@@ -1,0 +1,41 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/seeker_enemy.gd" id="1_script"]
+[ext_resource type="Script" path="res://scripts/core/health_component.gd" id="2_health"]
+[ext_resource type="Script" path="res://scripts/core/damage_source.gd" id="3_damage"]
+
+[sub_resource type="StandardMaterial3D" id="mat_seeker"]
+albedo_color = Color(0.8, 0.2, 0.9, 1)
+roughness = 0.4
+emission_enabled = true
+emission = Color(0.6, 0.1, 0.8, 1)
+emission_energy_multiplier = 1.0
+
+[sub_resource type="SphereMesh" id="mesh_seeker"]
+radius = 0.4
+height = 0.8
+
+[sub_resource type="SphereShape3D" id="shape_seeker"]
+radius = 0.4
+
+[node name="SeekerEnemy" type="CharacterBody3D"]
+script = ExtResource("1_script")
+max_health = 25.0
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("mesh_seeker")
+material_override = SubResource("mat_seeker")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("shape_seeker")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("2_health")
+max_health = 25.0
+
+[node name="DamageSource" type="Area3D" parent="."]
+script = ExtResource("3_damage")
+damage_amount = 12.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DamageSource"]
+shape = SubResource("shape_seeker")

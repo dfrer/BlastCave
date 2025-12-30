@@ -1,0 +1,40 @@
+[gd_scene load_steps=6 format=3]
+
+[sub_resource type="StandardMaterial3D" id="mat_tunnel"]
+albedo_color = Color(0.22, 0.2, 0.18, 1)
+roughness = 0.8
+metallic = 0.05
+
+[sub_resource type="CylinderMesh" id="mesh_tunnel"]
+top_radius = 2.5
+bottom_radius = 2.5
+height = 10.0
+radial_segments = 12
+
+[sub_resource type="BoxMesh" id="mesh_floor"]
+size = Vector3(4, 0.5, 10)
+
+[sub_resource type="BoxShape3D" id="shape_floor"]
+size = Vector3(4, 0.5, 10)
+
+[sub_resource type="PhysicsMaterial" id="physics_tunnel"]
+friction = 0.1
+bounce = 0.25
+
+[node name="CaveTunnel" type="Node3D"]
+
+[node name="TunnelVisual" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 1.5, 0)
+mesh = SubResource("mesh_tunnel")
+material_override = SubResource("mat_tunnel")
+
+[node name="Floor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+physics_material_override = SubResource("physics_tunnel")
+
+[node name="Mesh" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("mesh_floor")
+material_override = SubResource("mat_tunnel")
+
+[node name="Collision" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("shape_floor")

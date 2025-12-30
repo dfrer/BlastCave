@@ -5,9 +5,9 @@ signal inventory_changed
 signal scrap_changed(new_scrap: int)
 
 var explosives = {
-	"ImpulseCharge": 5,
-	"ShapedCharge": 5,
-	"DelayedCharge": 5
+	"ImpulseCharge": 8,  # Increased for blast-propulsion (was 5)
+	"ShapedCharge": 6,   # Increased (was 5)
+	"DelayedCharge": 6   # Increased (was 5)
 }
 
 var scrap: int = 0

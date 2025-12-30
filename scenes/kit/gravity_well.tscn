@@ -1,0 +1,54 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/levels/gravity_well.gd" id="1_script"]
+
+[sub_resource type="StandardMaterial3D" id="mat_core"]
+albedo_color = Color(0.2, 0.1, 0.4, 1)
+emission_enabled = true
+emission = Color(0.5, 0.2, 1.0, 1)
+emission_energy_multiplier = 3.0
+roughness = 0.2
+
+[sub_resource type="StandardMaterial3D" id="mat_ring"]
+albedo_color = Color(0.3, 0.15, 0.5, 0.7)
+emission_enabled = true
+emission = Color(0.4, 0.2, 0.8, 1)
+emission_energy_multiplier = 1.5
+transparency = 1
+
+[sub_resource type="SphereMesh" id="mesh_core"]
+radius = 0.4
+height = 0.8
+
+[sub_resource type="TorusMesh" id="mesh_ring"]
+inner_radius = 1.5
+outer_radius = 2.0
+
+[sub_resource type="SphereShape3D" id="shape_field"]
+radius = 4.0
+
+[node name="GravityWell" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="Core" type="MeshInstance3D" parent="."]
+mesh = SubResource("mesh_core")
+material_override = SubResource("mat_core")
+
+[node name="Ring1" type="MeshInstance3D" parent="."]
+mesh = SubResource("mesh_ring")
+material_override = SubResource("mat_ring")
+
+[node name="Ring2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.707, 0.707, 0, -0.707, 0.707, 0, 0, 0)
+mesh = SubResource("mesh_ring")
+material_override = SubResource("mat_ring")
+
+[node name="FieldArea" type="Area3D" parent="."]
+
+[node name="FieldShape" type="CollisionShape3D" parent="FieldArea"]
+shape = SubResource("shape_field")
+
+[node name="CoreLight" type="OmniLight3D" parent="."]
+light_color = Color(0.5, 0.2, 1, 1)
+light_energy = 1.5
+omni_range = 6.0

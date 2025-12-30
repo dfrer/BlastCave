@@ -1,0 +1,36 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/levels/bouncy_surface.gd" id="1_script"]
+
+[sub_resource type="StandardMaterial3D" id="mat_bouncy"]
+albedo_color = Color(0.2, 0.6, 0.8, 1)
+emission_enabled = true
+emission = Color(0.3, 0.8, 1.0, 1)
+emission_energy_multiplier = 1.5
+roughness = 0.3
+metallic = 0.4
+
+[sub_resource type="BoxMesh" id="mesh_surface"]
+size = Vector3(4, 0.3, 4)
+
+[sub_resource type="BoxShape3D" id="shape_surface"]
+size = Vector3(4, 0.3, 4)
+
+[sub_resource type="PhysicsMaterial" id="physics_bouncy"]
+friction = 0.2
+bounce = 0.7
+
+[node name="BouncySurface" type="StaticBody3D"]
+physics_material_override = SubResource("physics_bouncy")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("mesh_surface")
+material_override = SubResource("mat_bouncy")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+shape = SubResource("shape_surface")
+
+[node name="BouncyLogic" type="Node" parent="."]
+script = ExtResource("1_script")
+bounce_coefficient = 0.7
+surface_type = "crystal"

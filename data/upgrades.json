@@ -3,28 +3,180 @@
     "id": "force_amplifier",
     "name": "Force Amplifier",
     "description": "+25% blast force",
-    "effects": {"explosive_force_mult": 1.25},
-    "cost": 8
+    "effects": {
+      "explosive_force_mult": 1.25
+    },
+    "cost": 8,
+    "rarity": "common",
+    "icon": "💥"
   },
   {
     "id": "radius_expander",
     "name": "Radius Expander",
     "description": "+20% blast radius",
-    "effects": {"explosive_radius_mult": 1.2},
-    "cost": 7
+    "effects": {
+      "explosive_radius_mult": 1.2
+    },
+    "cost": 7,
+    "rarity": "common",
+    "icon": "🔘"
   },
   {
     "id": "quick_charge",
     "name": "Quick Charge",
     "description": "-20% ability cooldown",
-    "effects": {"ability_cooldown_mult": 0.8},
-    "cost": 6
+    "effects": {
+      "ability_cooldown_mult": 0.8
+    },
+    "cost": 6,
+    "rarity": "common",
+    "icon": "⚡"
   },
   {
     "id": "volatile_mix",
     "name": "Volatile Mix",
     "description": "Explosives hit harder and wider",
-    "effects": {"explosive_force_mult": 1.15, "explosive_radius_mult": 1.1},
-    "cost": 10
+    "effects": {
+      "explosive_force_mult": 1.15,
+      "explosive_radius_mult": 1.1
+    },
+    "cost": 10,
+    "rarity": "uncommon",
+    "icon": "🧪"
+  },
+  {
+    "id": "blast_immunity",
+    "name": "Blast Immunity",
+    "description": "Take no damage from your own explosions",
+    "effects": {
+      "self_damage_mult": 0.0
+    },
+    "cost": 15,
+    "rarity": "rare",
+    "icon": "🛡️"
+  },
+  {
+    "id": "momentum_shield",
+    "name": "Momentum Shield",
+    "description": "Damage reduction scales with your speed",
+    "effects": {
+      "velocity_damage_reduction": true,
+      "max_reduction": 0.5
+    },
+    "cost": 12,
+    "rarity": "uncommon",
+    "icon": "💨"
+  },
+  {
+    "id": "quick_reload",
+    "name": "Quick Reload",
+    "description": "Explosives recharge 30% faster",
+    "effects": {
+      "explosive_recharge_mult": 1.3
+    },
+    "cost": 9,
+    "rarity": "common",
+    "icon": "🔄"
+  },
+  {
+    "id": "chain_reaction",
+    "name": "Chain Reaction",
+    "description": "Explosions have 15% chance to trigger bonus explosion",
+    "effects": {
+      "chain_explosion_chance": 0.15
+    },
+    "cost": 14,
+    "rarity": "rare",
+    "icon": "🔗"
+  },
+  {
+    "id": "heavy_landing",
+    "name": "Heavy Landing",
+    "description": "Landing creates a small shockwave",
+    "effects": {
+      "landing_shockwave": true,
+      "shockwave_force": 3.0
+    },
+    "cost": 8,
+    "rarity": "uncommon",
+    "icon": "⬇️"
+  },
+  {
+    "id": "air_control",
+    "name": "Air Control",
+    "description": "+50% air control while airborne",
+    "effects": {
+      "air_control_mult": 1.5
+    },
+    "cost": 7,
+    "rarity": "common",
+    "icon": "🌀"
+  },
+  {
+    "id": "glass_cannon",
+    "name": "Glass Cannon",
+    "description": "+50% blast force, but +50% damage taken",
+    "effects": {
+      "explosive_force_mult": 1.5,
+      "damage_taken_mult": 1.5
+    },
+    "cost": 5,
+    "rarity": "uncommon",
+    "icon": "🔮"
+  },
+  {
+    "id": "scrap_magnet",
+    "name": "Scrap Magnet",
+    "description": "Pickups are attracted to you from further away",
+    "effects": {
+      "pickup_range_mult": 2.0
+    },
+    "cost": 4,
+    "rarity": "common",
+    "icon": "🧲"
+  },
+  {
+    "id": "extra_ammo",
+    "name": "Ammo Reserve",
+    "description": "+2 max explosives of each type",
+    "effects": {
+      "max_ammo_bonus": 2
+    },
+    "cost": 6,
+    "rarity": "common",
+    "icon": "📦"
+  },
+  {
+    "id": "focused_blast",
+    "name": "Focused Blast",
+    "description": "Shaped charges deal 40% more damage",
+    "effects": {
+      "shaped_charge_mult": 1.4
+    },
+    "cost": 8,
+    "rarity": "uncommon",
+    "icon": "🎯"
+  },
+  {
+    "id": "cluster_frenzy",
+    "name": "Cluster Frenzy",
+    "description": "Cluster charges spawn 3 more sub-explosions",
+    "effects": {
+      "cluster_bonus": 3
+    },
+    "cost": 11,
+    "rarity": "rare",
+    "icon": "💣"
+  },
+  {
+    "id": "repulsor_wave",
+    "name": "Repulsor Wave",
+    "description": "Repulsor charges push 50% further",
+    "effects": {
+      "repulsor_range_mult": 1.5
+    },
+    "cost": 9,
+    "rarity": "uncommon",
+    "icon": "🌊"
   }
 ]

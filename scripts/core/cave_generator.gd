@@ -10,18 +10,44 @@ enum RoomType { START, COMBAT, PUZZLE, SHOP, REWARD, BOSS, EXIT }
 @export var branch_depth_min: int = 1
 @export var branch_depth_max: int = 2
 
+# Difficulty scaling
+@export var difficulty_scale_per_depth: float = 0.15  # +15% difficulty per depth
+
 @export var start_scene: PackedScene = preload("res://scenes/levels/room_01_intro.tscn")
 @export var combat_scene: PackedScene = preload("res://scenes/levels/room_02_traversal.tscn")
 @export var puzzle_scene: PackedScene = preload("res://scenes/levels/room_07_puzzle_jump.tscn")
 @export var puzzle_scenes: Array[PackedScene] = [
 	preload("res://scenes/levels/room_05_chasm.tscn"),
 	preload("res://scenes/levels/room_07_puzzle_jump.tscn"),
-	preload("res://scenes/levels/room_08_bridge_puzzle.tscn")
+	preload("res://scenes/levels/room_08_bridge_puzzle.tscn"),
+	preload("res://scenes/levels/room_09_vertical_shaft.tscn"),
+	preload("res://scenes/levels/room_10_momentum_run.tscn"),
+	preload("res://scenes/levels/room_11_precision_maze.tscn")
 ]
 @export var shop_scene: PackedScene = preload("res://scenes/levels/room_06_pivot.tscn")
 @export var reward_scene: PackedScene = preload("res://scenes/levels/room_06_pivot.tscn")
 @export var boss_scene: PackedScene = preload("res://scenes/levels/room_04_boss.tscn")
 @export var exit_scene: PackedScene = preload("res://scenes/levels/room_03_exit.tscn")
+
+# Room modifiers that can be applied
+enum RoomModifier { NONE, DARK, HAZARDOUS, TIMED, ENEMY_DENSE }
+
+func get_difficulty_multiplier(depth: int) -> float:
+	return 1.0 + (depth * difficulty_scale_per_depth)
+
+func get_room_modifier(depth: int, rng: RandomNumberGenerator) -> int:
+	# No modifiers in early rooms
+	if depth < 2:
+		return RoomModifier.NONE
+	
+	# Increasing chance of modifiers with depth
+	var modifier_chance = clampf(depth * 0.1, 0.0, 0.6)
+	if rng.randf() > modifier_chance:
+		return RoomModifier.NONE
+	
+	# Pick random modifier
+	var modifiers = [RoomModifier.DARK, RoomModifier.HAZARDOUS, RoomModifier.TIMED, RoomModifier.ENEMY_DENSE]
+	return modifiers[rng.randi() % modifiers.size()]
 
 func generate_cave() -> Array:
 	var rng = RandomNumberGenerator.new()
@@ -58,7 +84,7 @@ func generate_cave() -> Array:
 		var room_id = "room_%d" % id_counter
 		id_counter += 1
 		room_ids.append(room_id)
-		rooms.append(_build_room_data(room_id, room_type, depth, 0, ""))
+		rooms.append(_build_room_data(room_id, room_type, depth, 0, "", rng))
 
 	for idx in range(1, room_plan.size() - 2):
 		if rng.randf() > branch_chance:
@@ -72,7 +98,7 @@ func generate_cave() -> Array:
 			id_counter += 1
 			if branch_root_id == "":
 				branch_root_id = branch_room_id
-			var data = _build_room_data(branch_room_id, branch_type, idx + branch_depth + 1, branch_index, parent_id)
+			var data = _build_room_data(branch_room_id, branch_type, idx + branch_depth + 1, branch_index, parent_id, rng)
 			data["meta"]["branch_depth"] = branch_depth
 			data["meta"]["branch_root_id"] = branch_root_id
 			data["meta"]["branch_reward_bias"] = branch_depth == branch_len - 1
@@ -85,21 +111,26 @@ func generate_cave() -> Array:
 func stitch_chunk(_chunk_scene: PackedScene, _tags: Array[MetaTag]):
 	pass
 
-func _build_room_data(room_id: String, room_type: int, depth: int, branch_index: int, parent_id: String) -> Dictionary:
+func _build_room_data(room_id: String, room_type: int, depth: int, branch_index: int, parent_id: String, rng: RandomNumberGenerator) -> Dictionary:
 	var scene = _scene_for_type(room_type)
+	var modifier = get_room_modifier(depth, rng)
+	
 	var meta: Dictionary = {
 		"room_type": room_type,
 		"depth": depth,
 		"branch_index": branch_index,
 		"branch": branch_index > 0,
-		"difficulty_scale": 1.0 + float(depth) * 0.15,
+		"difficulty_scale": get_difficulty_multiplier(depth),
+		"modifier": modifier,
 		"tags": _tags_for_room(room_type, depth, branch_index),
 		"narrative_line": _narrative_for_depth(depth)
 	}
+
 	return {
 		"id": room_id,
 		"parent_id": parent_id,
 		"scene": scene,
+		"branch_index": branch_index,
 		"meta": meta
 	}
 

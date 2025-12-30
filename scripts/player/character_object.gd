@@ -24,9 +24,36 @@ var movement_controller: PlayerMovement
 
 # Look-at system
 var _head_pivot: Node3D
+var _face_pivot: Node3D
 var _look_target: Vector3 = Vector3.ZERO
 var _has_look_target: bool = false
 @export var look_speed: float = 8.0
+
+# Sphere physics - rolling character
+@export var sphere_radius: float = 0.5
+## Maximum linear velocity - increased for rolling momentum
+const MAX_LINEAR_VELOCITY: float = 75.0
+## Momentum preservation when rolling (0-1)
+@export var momentum_preservation: float = 0.98
+## Bounce coefficient for surfaces
+@export var bounce_coefficient: float = 0.4
+## Speed threshold for reduced friction (roll faster = less grip)
+@export var speed_friction_threshold: float = 8.0
+
+# Face stabilization - keep face upright while body rolls
+@export var face_stabilization_strength: float = 12.0
+@export var face_stabilization_damp: float = 8.0
+var _target_face_rotation: Basis = Basis.IDENTITY
+
+# Angular velocity dampening for rolling control
+@export var grounded_angular_damp: float = 0.92
+const SLOW_ANGULAR_DAMP_THRESHOLD: float = 3.0
+const SLOW_ANGULAR_DAMP: float = 0.85
+const GROUND_CHECK_DISTANCE: float = 0.6
+
+# Impact detection
+var _last_velocity: Vector3 = Vector3.ZERO
+const IMPACT_THRESHOLD: float = 10.0
 
 # Eye feedback system
 var _eye_main: MeshInstance3D
@@ -38,18 +65,23 @@ var _explosive_colors: Dictionary = {
 
 func _ready():
 	_load_characters()
-	# Optional: Set default if not set by run_start
 	if current_character_id == "":
 		set_character("core")
 	if not movement_controller:
 		movement_controller = PlayerMovement.new()
 		movement_controller.name = "PlayerMovement"
 		add_child(movement_controller)
-	# Find HeadPivot for look-at
+	
+	# Find pivots for look-at and face stabilization
 	_head_pivot = get_node_or_null("HeadPivot")
+	_face_pivot = get_node_or_null("FacePivot")
+	
 	# Find EyeMain for color feedback
 	if _head_pivot:
 		_eye_main = _head_pivot.get_node_or_null("EyeMain") as MeshInstance3D
+	
+	# Initialize target face rotation
+	_target_face_rotation = global_transform.basis
 
 func _load_characters():
 	var file = FileAccess.open("res://data/characters.json", FileAccess.READ)
@@ -82,7 +114,8 @@ func set_character(character_id: String) -> void:
 		
 		if not physics_material_override:
 			physics_material_override = PhysicsMaterial.new()
-		physics_material_override.friction = data.get("friction", 0.5)
+		physics_material_override.friction = data.get("friction", 0.3)
+		physics_material_override.bounce = bounce_coefficient
 		
 		# Reset ability state
 		is_pinned = false
@@ -94,7 +127,6 @@ func set_character(character_id: String) -> void:
 		
 		print("Character set: ", data.get("display_name", character_id))
 	else:
-		# Fallback if JSON failed or ID missing
 		if characters_data.is_empty(): _load_characters()
 		if characters_data.has(character_id):
 			set_character(character_id)
@@ -105,21 +137,35 @@ func get_current_id() -> String:
 	return current_character_id
 
 func _physics_process(delta):
+	# Apply movement if not pinned
 	if movement_controller and not is_pinned:
 		movement_controller.apply_movement(self, delta)
+	
+	# Sphere physics: velocity clamping and momentum
+	_apply_velocity_clamping()
+	_apply_rolling_physics(delta)
+	
+	# Keep face upright while body rolls
+	_stabilize_face(delta)
+	
+	# Detect high-velocity impacts for feedback
+	_detect_impacts()
+	
+	# Update ability cooldowns
 	if ability_cooldown_remaining > 0.0:
 		ability_cooldown_remaining = maxf(ability_cooldown_remaining - delta, 0.0)
 		_emit_cooldown()
 	if _gyro_active_remaining > 0.0:
 		_gyro_active_remaining = maxf(_gyro_active_remaining - delta, 0.0)
-	# Ability: Gyro Stabilize
+	
+	# Ability: Gyro Stabilize - dampen angular velocity
 	if ability == "gyro_stabilize":
 		if _gyro_active_remaining > 0.0:
 			angular_velocity *= lerp(1.0, 0.75, ability_power)
 		else:
 			angular_velocity *= 0.95
 	
-	# Ability: Anchor Pin
+	# Ability: Anchor Pin cooldown
 	if pin_cooldown_remaining > 0:
 		pin_cooldown_remaining -= delta
 		ability_cooldown_remaining = pin_cooldown_remaining
@@ -137,6 +183,91 @@ func _physics_process(delta):
 	
 	# Look-at logic
 	_update_head_look(delta)
+	
+	# Store velocity for next frame's impact detection
+	_last_velocity = linear_velocity
+
+func _apply_velocity_clamping() -> void:
+	if linear_velocity.length() > MAX_LINEAR_VELOCITY:
+		linear_velocity = linear_velocity.normalized() * MAX_LINEAR_VELOCITY
+
+func _apply_rolling_physics(_delta: float) -> void:
+	## Rolling-specific physics adjustments
+	var grounded = _is_grounded()
+	var speed = linear_velocity.length()
+	
+	# Dynamic friction based on speed - roll faster = less friction
+	if grounded and physics_material_override:
+		var base_friction = physics_material_override.friction
+		if speed > speed_friction_threshold:
+			# Reduce friction at high speeds for better momentum
+			var speed_factor = clampf((speed - speed_friction_threshold) / 20.0, 0.0, 0.5)
+			physics_material_override.friction = base_friction * (1.0 - speed_factor)
+		else:
+			# Restore base friction when slow
+			var char_data = characters_data.get(current_character_id, {})
+			physics_material_override.friction = char_data.get("friction", 0.3)
+	
+	# Angular dampening - smoother control
+	if grounded:
+		if speed < SLOW_ANGULAR_DAMP_THRESHOLD:
+			angular_velocity *= SLOW_ANGULAR_DAMP
+		else:
+			angular_velocity *= grounded_angular_damp
+
+func _stabilize_face(delta: float) -> void:
+	## Keep the face/head pivots upright while the body rolls
+	## This creates a "gyroscope" effect for the character's face
+	
+	if not _head_pivot and not _face_pivot:
+		return
+	
+	# Calculate target rotation - face should point "forward" in world space
+	# but follow the body's general direction of travel
+	var move_dir = Vector3(linear_velocity.x, 0, linear_velocity.z)
+	if move_dir.length_squared() > 0.5:
+		# Face the direction of movement
+		var target_basis = Basis.looking_at(-move_dir.normalized(), Vector3.UP)
+		_target_face_rotation = _target_face_rotation.slerp(target_basis, delta * 3.0)
+	
+	# Apply counter-rotation to keep pivots upright
+	var body_rotation_inverse = global_transform.basis.inverse()
+	var world_up_local = body_rotation_inverse * Vector3.UP
+	var world_forward_local = body_rotation_inverse * _target_face_rotation.z
+	
+	# Construct upright basis in local space
+	var stable_basis = Basis()
+	stable_basis.y = world_up_local.normalized()
+	stable_basis.z = world_forward_local.slide(stable_basis.y).normalized()
+	if stable_basis.z.length_squared() < 0.01:
+		stable_basis.z = body_rotation_inverse * Vector3.FORWARD
+	stable_basis.x = stable_basis.y.cross(stable_basis.z).normalized()
+	stable_basis = stable_basis.orthonormalized()
+	
+	# Apply stabilized rotation to face pivots
+	if _head_pivot:
+		_head_pivot.transform.basis = _head_pivot.transform.basis.slerp(stable_basis, delta * face_stabilization_strength)
+	if _face_pivot:
+		_face_pivot.transform.basis = _face_pivot.transform.basis.slerp(stable_basis, delta * face_stabilization_strength)
+
+func _is_grounded() -> bool:
+	var space_state = get_world_3d().direct_space_state
+	if not space_state:
+		return false
+	var from = global_position
+	var to = from + Vector3.DOWN * GROUND_CHECK_DISTANCE
+	var query = PhysicsRayQueryParameters3D.create(from, to)
+	query.exclude = [self]
+	var result = space_state.intersect_ray(query)
+	return not result.is_empty()
+
+func _detect_impacts() -> void:
+	var velocity_change = (linear_velocity - _last_velocity).length()
+	if velocity_change > IMPACT_THRESHOLD:
+		var impact_strength = velocity_change / IMPACT_THRESHOLD
+		var contact_point = global_position + Vector3.DOWN * sphere_radius
+		FXHelper.spawn_impact(get_parent(), contact_point, Vector3.UP, "rock", velocity_change)
+		FXHelper.screen_shake(self, clampf(impact_strength * 0.12, 0.0, 0.4))
 
 func pin():
 	is_pinned = true
@@ -183,20 +314,17 @@ func clear_look_target() -> void:
 func _update_head_look(delta: float) -> void:
 	if not _head_pivot or not _has_look_target:
 		return
-	# Calculate direction from head to target in local space of the RigidBody
+	# Note: Head looking is now handled by _stabilize_face for basic orientation
+	# This adds additional pitch/yaw for looking at specific targets
 	var head_global_pos = _head_pivot.global_position
 	var direction = (_look_target - head_global_pos).normalized()
 	if direction.length_squared() < 0.001:
 		return
-	# Convert to local space for rotation
-	var local_dir = global_transform.basis.inverse() * direction
-	# Calculate target rotation (only Y-axis yaw, limited X-axis pitch)
-	var target_yaw = atan2(local_dir.x, local_dir.z)
-	var target_pitch = -asin(clampf(local_dir.y, -0.8, 0.8))
-	# Smooth interpolation
+	# Convert to local space for rotation adjustment
+	var local_dir = _head_pivot.transform.basis.inverse() * (_head_pivot.global_transform.basis.inverse() * direction)
+	var target_pitch = -asin(clampf(local_dir.y, -0.6, 0.6))
 	var current_rot = _head_pivot.rotation
-	_head_pivot.rotation.y = lerp_angle(current_rot.y, target_yaw, look_speed * delta)
-	_head_pivot.rotation.x = lerp(current_rot.x, target_pitch, look_speed * delta)
+	_head_pivot.rotation.x = lerp(current_rot.x, target_pitch, look_speed * delta * 0.5)
 
 # --- Eye Feedback System ---
 func set_explosive_type(type_name: String) -> void:

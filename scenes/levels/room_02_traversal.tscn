@@ -1,104 +1,296 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=19 format=3]
 
-[ext_resource type="PackedScene" path="res://scenes/enemies/basic_enemy.tscn" id="1_enemy"]
-[ext_resource type="PackedScene" path="res://scenes/enemies/fast_enemy.tscn" id="2_fast_enemy"]
-[ext_resource type="PackedScene" path="res://scenes/enemies/ranged_enemy.tscn" id="3_ranged_enemy"]
-[ext_resource type="Script" path="res://scripts/core/damage_source.gd" id="2_damage"]
-[ext_resource type="Script" path="res://scripts/puzzles/blast_switch.gd" id="3_switch"]
-[ext_resource type="PackedScene" path="res://scenes/puzzles/gate.tscn" id="4_gate"]
-[ext_resource type="PackedScene" path="res://scenes/kit/cave_floor.tscn" id="5_floor"]
-[ext_resource type="PackedScene" path="res://scenes/kit/cave_wall.tscn" id="6_wall"]
-[ext_resource type="PackedScene" path="res://scenes/kit/cave_column.tscn" id="7_column"]
-[ext_resource type="Script" path="res://scripts/enemies/enemy_spawner.gd" id="8_spawner"]
+[ext_resource type="PackedScene" path="res://scenes/kit/cave_ramp.tscn" id="1_ramp"]
+[ext_resource type="PackedScene" path="res://scenes/pickup_explosive.tscn" id="2_pickup"]
+[ext_resource type="PackedScene" path="res://scenes/kit/bounce_pad.tscn" id="3_bounce"]
+[ext_resource type="PackedScene" path="res://scenes/kit/bouncy_surface.tscn" id="4_bouncy"]
+[ext_resource type="PackedScene" path="res://scenes/kit/cave_wall.tscn" id="5_wall"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_3"]
-size = Vector3(6, 1, 6)
+[sub_resource type="StandardMaterial3D" id="mat_corridor"]
+albedo_color = Color(0.26, 0.24, 0.22, 1)
+roughness = 0.8
+metallic = 0.1
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_1"]
-bottom_radius = 0.4
-top_radius = 0.4
-height = 0.2
+[sub_resource type="StandardMaterial3D" id="mat_bank"]
+albedo_color = Color(0.22, 0.28, 0.32, 1)
+roughness = 0.6
+metallic = 0.2
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3"]
-albedo_color = Color(0.2, 0.2, 0.2, 1)
+[sub_resource type="StandardMaterial3D" id="mat_crystal"]
+albedo_color = Color(0.15, 0.5, 0.6, 1)
+emission_enabled = true
+emission = Color(0.2, 0.7, 0.8, 1)
+emission_energy_multiplier = 1.8
 
-[sub_resource type="CylinderShape3D" id="CylinderShape3D_1"]
-height = 0.5
-radius = 0.45
+[sub_resource type="StandardMaterial3D" id="mat_exit_glow"]
+albedo_color = Color(0.1, 0.8, 0.4, 1)
+emission_enabled = true
+emission = Color(0.2, 0.9, 0.5, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="BoxMesh" id="mesh_floor_section"]
+size = Vector3(14, 2, 16)
+
+[sub_resource type="BoxShape3D" id="shape_floor_section"]
+size = Vector3(14, 2, 16)
+
+[sub_resource type="BoxMesh" id="mesh_banked_wall"]
+size = Vector3(1.5, 6, 16)
+
+[sub_resource type="BoxShape3D" id="shape_banked_wall"]
+size = Vector3(1.5, 6, 16)
+
+[sub_resource type="CylinderMesh" id="mesh_crystal"]
+top_radius = 0.08
+bottom_radius = 0.25
+height = 1.0
+
+[sub_resource type="SphereMesh" id="mesh_beacon"]
+radius = 0.35
+height = 0.7
+
+[sub_resource type="PhysicsMaterial" id="physics_smooth"]
+friction = 0.15
+bounce = 0.35
+
+[sub_resource type="BoxMesh" id="mesh_connector"]
+size = Vector3(14, 2, 4)
+
+[sub_resource type="BoxShape3D" id="shape_connector"]
+size = Vector3(14, 2, 4)
 
 [node name="Room02Traversal" type="Node3D"]
 
-[node name="Floor" parent="." instance=ExtResource("5_floor")]
-
-[node name="WallNorth" parent="." instance=ExtResource("6_wall")]
-position = Vector3(0, 2, -9.5)
-
-[node name="WallSouth" parent="." instance=ExtResource("6_wall")]
-position = Vector3(0, 2, 9.5)
-
-[node name="WallEast" parent="." instance=ExtResource("6_wall")]
-position = Vector3(9.5, 2, 0)
-rotation_degrees = Vector3(0, 90, 0)
-
-[node name="WallWest" parent="." instance=ExtResource("6_wall")]
-position = Vector3(-9.5, 2, 0)
-rotation_degrees = Vector3(0, 90, 0)
-
-[node name="ColumnObstacle" parent="." instance=ExtResource("7_column")]
-position = Vector3(4, 1, 0)
-scale = Vector3(1.2, 0.5, 1.2)
-
-[node name="ColumnA" parent="." instance=ExtResource("7_column")]
-position = Vector3(-6, 2, -6)
-
-[node name="ColumnB" parent="." instance=ExtResource("7_column")]
-position = Vector3(6, 2, 6)
-
-[node name="HazardArea" type="Area3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.5, 0)
-script = ExtResource("2_damage")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="HazardArea"]
-shape = SubResource("BoxShape3D_3")
-
 [node name="Entry" type="Marker3D" parent="." groups=["chunk_entry"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 10)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 16)
 
 [node name="Exit" type="Marker3D" parent="." groups=["chunk_exit"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -10)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2, -34)
 
-[node name="SpawnPointA" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 1, 0)
+[node name="Corridor" type="Node3D" parent="."]
 
-[node name="SpawnPointB" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 1, -4)
+[node name="FloorSection1" type="StaticBody3D" parent="Corridor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 8)
+physics_material_override = SubResource("physics_smooth")
 
-[node name="EnemySpawner" type="Node3D" parent="."]
-script = ExtResource("8_spawner")
-spawn_scenes = Array[PackedScene]([ExtResource("1_enemy"), ExtResource("2_fast_enemy"), ExtResource("3_ranged_enemy")])
-spawn_points = Array[NodePath]([NodePath("../SpawnPointA"), NodePath("../SpawnPointB")])
-max_alive = 4
-spawn_interval = 4.0
-initial_burst = 2
+[node name="Mesh" type="MeshInstance3D" parent="Corridor/FloorSection1"]
+mesh = SubResource("mesh_floor_section")
+material_override = SubResource("mat_corridor")
 
-[node name="Gate" parent="." instance=ExtResource("4_gate")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6)
-switch_path = NodePath("../BlastSwitch")
+[node name="Collision" type="CollisionShape3D" parent="Corridor/FloorSection1"]
+shape = SubResource("shape_floor_section")
 
-[node name="BlastSwitch" type="Area3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.25, 0)
-script = ExtResource("3_switch")
-required_impulse = 12.0
+[node name="Connector1" type="StaticBody3D" parent="Corridor"]
+transform = Transform3D(1, 0, 0, 0, 0.96593, -0.25882, 0, 0.25882, 0.96593, 0, -0.5, -2)
+physics_material_override = SubResource("physics_smooth")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="BlastSwitch"]
-shape = SubResource("CylinderShape3D_1")
+[node name="Mesh" type="MeshInstance3D" parent="Corridor/Connector1"]
+mesh = SubResource("mesh_connector")
+material_override = SubResource("mat_corridor")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="BlastSwitch"]
-mesh = SubResource("CylinderMesh_1")
-material_override = SubResource("StandardMaterial3D_3")
+[node name="Collision" type="CollisionShape3D" parent="Corridor/Connector1"]
+shape = SubResource("shape_connector")
 
-[node name="IndicatorLight" type="OmniLight3D" parent="BlastSwitch"]
+[node name="FloorSection2" type="StaticBody3D" parent="Corridor"]
+transform = Transform3D(1, 0, 0, 0, 0.96593, -0.25882, 0, 0.25882, 0.96593, 0, -2, -10)
+physics_material_override = SubResource("physics_smooth")
+
+[node name="Mesh" type="MeshInstance3D" parent="Corridor/FloorSection2"]
+mesh = SubResource("mesh_floor_section")
+material_override = SubResource("mat_corridor")
+
+[node name="Collision" type="CollisionShape3D" parent="Corridor/FloorSection2"]
+shape = SubResource("shape_floor_section")
+
+[node name="Connector2" type="StaticBody3D" parent="Corridor"]
+transform = Transform3D(1, 0, 0, 0, 0.96593, -0.25882, 0, 0.25882, 0.96593, 0, -3.5, -20)
+physics_material_override = SubResource("physics_smooth")
+
+[node name="Mesh" type="MeshInstance3D" parent="Corridor/Connector2"]
+mesh = SubResource("mesh_connector")
+material_override = SubResource("mat_corridor")
+
+[node name="Collision" type="CollisionShape3D" parent="Corridor/Connector2"]
+shape = SubResource("shape_connector")
+
+[node name="FloorSection3" type="StaticBody3D" parent="Corridor"]
+transform = Transform3D(1, 0, 0, 0, 0.96593, -0.25882, 0, 0.25882, 0.96593, 0, -5, -28)
+physics_material_override = SubResource("physics_smooth")
+
+[node name="Mesh" type="MeshInstance3D" parent="Corridor/FloorSection3"]
+mesh = SubResource("mesh_floor_section")
+material_override = SubResource("mat_corridor")
+
+[node name="Collision" type="CollisionShape3D" parent="Corridor/FloorSection3"]
+shape = SubResource("shape_floor_section")
+
+[node name="WallLeft1" type="StaticBody3D" parent="Corridor"]
+transform = Transform3D(0.96593, 0.25882, 0, -0.25882, 0.96593, 0, 0, 0, 1, -8, 2, 4)
+
+[node name="Mesh" type="MeshInstance3D" parent="Corridor/WallLeft1"]
+mesh = SubResource("mesh_banked_wall")
+material_override = SubResource("mat_bank")
+
+[node name="Collision" type="CollisionShape3D" parent="Corridor/WallLeft1"]
+shape = SubResource("shape_banked_wall")
+
+[node name="WallRight1" type="StaticBody3D" parent="Corridor"]
+transform = Transform3D(0.96593, -0.25882, 0, 0.25882, 0.96593, 0, 0, 0, 1, 8, 2, 4)
+
+[node name="Mesh" type="MeshInstance3D" parent="Corridor/WallRight1"]
+mesh = SubResource("mesh_banked_wall")
+material_override = SubResource("mat_bank")
+
+[node name="Collision" type="CollisionShape3D" parent="Corridor/WallRight1"]
+shape = SubResource("shape_banked_wall")
+
+[node name="WallLeft2" type="StaticBody3D" parent="Corridor"]
+transform = Transform3D(0.96593, 0.25882, 0, -0.25882, 0.96593, 0, 0, 0, 1, -8, 0, -12)
+
+[node name="Mesh" type="MeshInstance3D" parent="Corridor/WallLeft2"]
+mesh = SubResource("mesh_banked_wall")
+material_override = SubResource("mat_bank")
+
+[node name="Collision" type="CollisionShape3D" parent="Corridor/WallLeft2"]
+shape = SubResource("shape_banked_wall")
+
+[node name="WallRight2" type="StaticBody3D" parent="Corridor"]
+transform = Transform3D(0.96593, -0.25882, 0, 0.25882, 0.96593, 0, 0, 0, 1, 8, 0, -12)
+
+[node name="Mesh" type="MeshInstance3D" parent="Corridor/WallRight2"]
+mesh = SubResource("mesh_banked_wall")
+material_override = SubResource("mat_bank")
+
+[node name="Collision" type="CollisionShape3D" parent="Corridor/WallRight2"]
+shape = SubResource("shape_banked_wall")
+
+[node name="WallLeft3" type="StaticBody3D" parent="Corridor"]
+transform = Transform3D(0.96593, 0.25882, 0, -0.25882, 0.96593, 0, 0, 0, 1, -8, -3, -28)
+
+[node name="Mesh" type="MeshInstance3D" parent="Corridor/WallLeft3"]
+mesh = SubResource("mesh_banked_wall")
+material_override = SubResource("mat_bank")
+
+[node name="Collision" type="CollisionShape3D" parent="Corridor/WallLeft3"]
+shape = SubResource("shape_banked_wall")
+
+[node name="WallRight3" type="StaticBody3D" parent="Corridor"]
+transform = Transform3D(0.96593, -0.25882, 0, 0.25882, 0.96593, 0, 0, 0, 1, 8, -3, -28)
+
+[node name="Mesh" type="MeshInstance3D" parent="Corridor/WallRight3"]
+mesh = SubResource("mesh_banked_wall")
+material_override = SubResource("mat_bank")
+
+[node name="Collision" type="CollisionShape3D" parent="Corridor/WallRight3"]
+shape = SubResource("shape_banked_wall")
+
+[node name="BouncePads" type="Node3D" parent="."]
+
+[node name="BouncePad1" parent="BouncePads" instance=ExtResource("3_bounce")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.2, 10)
+
+[node name="BouncePad2" parent="BouncePads" instance=ExtResource("3_bounce")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.2, 10)
+
+[node name="BouncePad3" parent="BouncePads" instance=ExtResource("3_bounce")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.5, -6)
+
+[node name="BouncePad4" parent="BouncePads" instance=ExtResource("3_bounce")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4, -20)
+
+[node name="BouncyWallCorner1" parent="BouncePads" instance=ExtResource("4_bouncy")]
+transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, -5, 0, -12)
+scale = Vector3(0.3, 2, 1.5)
+
+[node name="BouncyWallCorner2" parent="BouncePads" instance=ExtResource("4_bouncy")]
+transform = Transform3D(0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, 0.707107, 5, -3, -26)
+scale = Vector3(0.3, 2, 1.5)
+
+[node name="Pickups" type="Node3D" parent="."]
+
+[node name="Pickup1" parent="Pickups" instance=ExtResource("2_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0.5, 8)
+explosive_type = "ImpulseCharge"
+amount = 2
+
+[node name="Pickup2" parent="Pickups" instance=ExtResource("2_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.5, 8)
+explosive_type = "ImpulseCharge"
+amount = 2
+
+[node name="Pickup3" parent="Pickups" instance=ExtResource("2_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
+explosive_type = "ShapedCharge"
+amount = 2
+
+[node name="Pickup4" parent="Pickups" instance=ExtResource("2_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, -2, -10)
+explosive_type = "ImpulseCharge"
+amount = 2
+
+[node name="Pickup5" parent="Pickups" instance=ExtResource("2_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, -2, -10)
+explosive_type = "ShapedCharge"
+amount = 2
+
+[node name="Pickup6" parent="Pickups" instance=ExtResource("2_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, -24)
+explosive_type = "DelayedCharge"
+amount = 2
+
+[node name="Decoration" type="Node3D" parent="."]
+
+[node name="Crystal1" type="MeshInstance3D" parent="Decoration"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.5, 5)
+rotation_degrees = Vector3(8, 15, -5)
+mesh = SubResource("mesh_crystal")
+material_override = SubResource("mat_crystal")
+
+[node name="Crystal2" type="MeshInstance3D" parent="Decoration"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.5, 5)
+rotation_degrees = Vector3(-5, -20, 8)
+mesh = SubResource("mesh_crystal")
+material_override = SubResource("mat_crystal")
+
+[node name="Crystal3" type="MeshInstance3D" parent="Decoration"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, -2, -14)
+rotation_degrees = Vector3(10, 30, -3)
+mesh = SubResource("mesh_crystal")
+material_override = SubResource("mat_crystal")
+
+[node name="ExitBeacon" type="MeshInstance3D" parent="Decoration"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4, -32)
+mesh = SubResource("mesh_beacon")
+material_override = SubResource("mat_exit_glow")
+
+[node name="Lighting" type="Node3D" parent="."]
+
+[node name="AmbientLight" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
+light_color = Color(0.7, 0.8, 0.9, 1)
+light_energy = 0.7
+omni_range = 25.0
+
+[node name="PathLight1" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 8)
+light_color = Color(0.4, 0.8, 0.9, 1)
 light_energy = 0.5
-shadow_enabled = true
+omni_range = 10.0
 
-[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="BlastSwitch"]
+[node name="PathLight2" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -8)
+light_color = Color(0.4, 0.8, 0.9, 1)
+light_energy = 0.5
+omni_range = 10.0
+
+[node name="PathLight3" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -3, -22)
+light_color = Color(0.4, 0.8, 0.9, 1)
+light_energy = 0.5
+omni_range = 10.0
+
+[node name="ExitLight" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2, -32)
+light_color = Color(0.3, 0.9, 0.5, 1)
+light_energy = 1.2
+omni_range = 10.0

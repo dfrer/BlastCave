@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" path="res://scenes/kit/cave_floor.tscn" id="1_floor"]
 [ext_resource type="PackedScene" path="res://scenes/kit/cave_wall.tscn" id="2_wall"]
 [ext_resource type="PackedScene" path="res://scenes/levels/detonatable_rock.tscn" id="3_rock"]
+[ext_resource type="PackedScene" path="res://scenes/kit/cave_platform.tscn" id="4_platform"]
 
 [sub_resource type="StandardMaterial3D" id="mat_rock"]
 albedo_color = Color(0.3, 0.28, 0.25, 1)
@@ -60,15 +61,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.5, 0, 0, 7.5)
 [node name="EndFloor" parent="Floors" instance=ExtResource("1_floor")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.5, 0, 0, -7.5)
 
-[node name="GapFloor" type="StaticBody3D" parent="Floors"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4, 0)
-
-[node name="Mesh" type="MeshInstance3D" parent="Floors/GapFloor"]
-mesh = SubResource("mesh_gap_floor")
-material_override = SubResource("mat_rock")
-
-[node name="Collision" type="CollisionShape3D" parent="Floors/GapFloor"]
-shape = SubResource("shape_gap_floor")
+[node name="GapFloor" parent="Floors" instance=ExtResource("1_floor")]
+transform = Transform3D(0.3, 0, 0, 0, 1, 0, 0, 0, 0.5, 0, -4, 0)
 
 [node name="Rocks" type="Node3D" parent="."]
 
@@ -86,15 +80,8 @@ mass = 50.0
 
 [node name="BridgeSupports" type="Node3D" parent="."]
 
-[node name="Support1" type="StaticBody3D" parent="BridgeSupports"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2, 0)
-
-[node name="Mesh" type="MeshInstance3D" parent="BridgeSupports/Support1"]
-mesh = SubResource("mesh_bridge_segment")
-material_override = SubResource("mat_rock")
-
-[node name="Collision" type="CollisionShape3D" parent="BridgeSupports/Support1"]
-shape = SubResource("shape_bridge_segment")
+[node name="Support1" parent="BridgeSupports" instance=ExtResource("4_platform")]
+transform = Transform3D(0.75, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2, 0)
 
 [node name="HintMarker" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 4)

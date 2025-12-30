@@ -1,7 +1,47 @@
 {
-    "blast_impulse": {
-        "name": "Standard Blast",
+    "ImpulseCharge": {
+        "name": "Impulse Charge",
+        "description": "Standard explosive with balanced force and radius",
+        "force": 10.0,
+        "radius": 5.0,
+        "color": [1.0, 0.7, 0.2],
+        "scene": "res://scenes/explosive.tscn"
+    },
+    "ShapedCharge": {
+        "name": "Shaped Charge",
+        "description": "Directional explosive with concentrated force in a cone",
         "force": 15.0,
-        "radius": 5.0
+        "radius": 4.0,
+        "cone_angle": 45.0,
+        "color": [0.2, 0.8, 1.0],
+        "scene": "res://scenes/explosives/shaped_charge.tscn"
+    },
+    "DelayedCharge": {
+        "name": "Delayed Charge",
+        "description": "Time-delayed explosive for strategic placement",
+        "force": 12.0,
+        "radius": 5.0,
+        "delay": 2.0,
+        "color": [0.9, 0.3, 0.6],
+        "scene": "res://scenes/explosives/delayed_charge.tscn"
+    },
+    "ClusterCharge": {
+        "name": "Cluster Charge",
+        "description": "Splits into multiple smaller explosions for area coverage",
+        "force": 5.0,
+        "radius": 3.0,
+        "cluster_count": 5,
+        "cluster_spread": 3.0,
+        "color": [0.6, 1.0, 0.4],
+        "scene": "res://scenes/explosives/cluster_charge.tscn"
+    },
+    "RepulsorCharge": {
+        "name": "Repulsor Charge",
+        "description": "Pushes everything away from the center",
+        "force": 12.0,
+        "radius": 6.0,
+        "push_multiplier": 1.5,
+        "color": [0.8, 0.4, 1.0],
+        "scene": "res://scenes/explosives/repulsor_charge.tscn"
     }
 }

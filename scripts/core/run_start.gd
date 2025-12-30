@@ -6,8 +6,8 @@ var selections: Array = ["core", "slug", "shard", "anchor", "gyro"]
 
 func _ready():
 	print("--- BLAST CAVE: RUN START ---")
-	print("Select character with keys 1-5.")
-	print("1:Core, 2:Slug, 3:Shard, 4:Anchor, 5:Gyro")
+	print("Select character with Shift+1-5.")
+	print("Shift+1:Core, Shift+2:Slug, Shift+3:Shard, Shift+4:Anchor, Shift+5:Gyro")
 	print("Default: ", current_selection)
 	print("Press ENTER to start run and spawn player.")
 
@@ -15,13 +15,13 @@ func _input(event):
 	if event is InputEventKey and event.pressed:
 		if event.keycode == KEY_ENTER:
 			start_run()
-	
-	# Use input actions for character selection
-	if Input.is_action_just_pressed("select_char_1"): _set_selection(0)
-	if Input.is_action_just_pressed("select_char_2"): _set_selection(1)
-	if Input.is_action_just_pressed("select_char_3"): _set_selection(2)
-	if Input.is_action_just_pressed("select_char_4"): _set_selection(3)
-	if Input.is_action_just_pressed("select_char_5"): _set_selection(4)
+		# Character selection with Shift+1-5 (since 1-3 are now explosives)
+		elif event.shift_pressed:
+			if event.keycode == KEY_1: _set_selection(0)
+			elif event.keycode == KEY_2: _set_selection(1)
+			elif event.keycode == KEY_3: _set_selection(2)
+			elif event.keycode == KEY_4: _set_selection(3)
+			elif event.keycode == KEY_5: _set_selection(4)
 
 func _set_selection(index: int):
 	current_selection = selections[index]

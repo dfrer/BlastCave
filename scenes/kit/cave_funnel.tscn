@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=3]
+
+[sub_resource type="StandardMaterial3D" id="mat_funnel"]
+albedo_color = Color(0.35, 0.32, 0.3, 1)
+roughness = 0.7
+metallic = 0.1
+
+[sub_resource type="CylinderMesh" id="mesh_funnel"]
+top_radius = 3.0
+bottom_radius = 1.0
+height = 3.0
+radial_segments = 16
+
+[sub_resource type="ConcavePolygonShape3D" id="shape_funnel"]
+
+[sub_resource type="ArrayMesh" id="collision_mesh"]
+
+[node name="CaveFunnel" type="StaticBody3D"]
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("mesh_funnel")
+material_override = SubResource("mat_funnel")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+shape = SubResource("shape_funnel")
+
+[node name="InnerTrigger" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.2, 0)
+
+[node name="TriggerShape" type="CollisionShape3D" parent="InnerTrigger"]
+shape = SubResource("shape_funnel")

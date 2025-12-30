@@ -1,13 +1,17 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
 albedo_color = Color(0.2, 0.2, 0.22, 1)
 
+[sub_resource type="StandardMaterial3D" id="mat_rim"]
+albedo_color = Color(0.25, 0.24, 0.26, 1)
+roughness = 0.8
+
 [sub_resource type="BoxMesh" id="BoxMesh_1"]
-size = Vector3(20, 1, 20)
+size = Vector3(24, 2, 24)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_1"]
-size = Vector3(20, 1, 20)
+size = Vector3(24, 2, 24)
 
 [node name="CaveFloor" type="Node3D"]
 
@@ -19,3 +23,51 @@ material_override = SubResource("StandardMaterial3D_1")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
 shape = SubResource("BoxShape3D_1")
+
+[node name="RimNorth" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, -11.7)
+size = Vector3(24, 0.6, 0.6)
+material = SubResource("mat_rim")
+
+[node name="RimSouth" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 11.7)
+size = Vector3(24, 0.6, 0.6)
+material = SubResource("mat_rim")
+
+[node name="RimEast" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.3, 0)
+size = Vector3(0.6, 0.6, 24)
+material = SubResource("mat_rim")
+
+[node name="RimWest" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.7, 1.3, 0)
+size = Vector3(0.6, 0.6, 24)
+material = SubResource("mat_rim")
+
+[node name="RimCollisionN" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, -11.7)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RimCollisionN"]
+shape = SubResource("BoxShape3D_1")
+scale = Vector3(1, 0.3, 0.025)
+
+[node name="RimCollisionS" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 11.7)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RimCollisionS"]
+shape = SubResource("BoxShape3D_1")
+scale = Vector3(1, 0.3, 0.025)
+
+[node name="RimCollisionE" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.3, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RimCollisionE"]
+shape = SubResource("BoxShape3D_1")
+scale = Vector3(0.025, 0.3, 1)
+
+[node name="RimCollisionW" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.7, 1.3, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RimCollisionW"]
+shape = SubResource("BoxShape3D_1")
+scale = Vector3(0.025, 0.3, 1)

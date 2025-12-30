@@ -1,7 +1,11 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/kit/cave_floor.tscn" id="1_floor"]
 [ext_resource type="PackedScene" path="res://scenes/kit/cave_wall.tscn" id="2_wall"]
+[ext_resource type="PackedScene" path="res://scenes/kit/cave_column.tscn" id="3_column"]
+[ext_resource type="PackedScene" path="res://scenes/kit/cave_platform.tscn" id="4_platform"]
+[ext_resource type="PackedScene" path="res://scenes/kit/cave_ramp.tscn" id="5_ramp"]
+[ext_resource type="PackedScene" path="res://scenes/kit/safety_rail.tscn" id="6_rail"]
 
 [sub_resource type="StandardMaterial3D" id="mat_rock"]
 albedo_color = Color(0.28, 0.25, 0.22, 1)
@@ -28,10 +32,10 @@ emission = Color(0.15, 0.5, 0.6, 1)
 emission_energy_multiplier = 1.2
 
 [sub_resource type="BoxMesh" id="mesh_main_platform"]
-size = Vector3(6, 0.6, 6)
+size = Vector3(8, 0.6, 8)
 
 [sub_resource type="BoxMesh" id="mesh_branch_path"]
-size = Vector3(3, 0.4, 8)
+size = Vector3(5, 0.4, 10)
 
 [sub_resource type="BoxMesh" id="mesh_pillar_wide"]
 size = Vector3(3, 8, 3)
@@ -42,10 +46,10 @@ bottom_radius = 0.5
 height = 1.5
 
 [sub_resource type="BoxShape3D" id="shape_main"]
-size = Vector3(6, 0.6, 6)
+size = Vector3(8, 0.6, 8)
 
 [sub_resource type="BoxShape3D" id="shape_branch"]
-size = Vector3(3, 0.4, 8)
+size = Vector3(5, 0.4, 10)
 
 [sub_resource type="BoxShape3D" id="shape_pillar"]
 size = Vector3(3, 8, 3)
@@ -53,124 +57,100 @@ size = Vector3(3, 8, 3)
 [node name="RoomPivot" type="Node3D"]
 
 [node name="Entry" type="Marker3D" parent="." groups=["chunk_entry"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 12)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 14)
 
 [node name="ExitForward" type="Marker3D" parent="." groups=["chunk_exit"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -12)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -14)
 
 [node name="ExitBranch" type="Marker3D" parent="." groups=["chunk_exit_branch"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 4, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 4, 0)
 
 [node name="Walls" type="Node3D" parent="."]
 
 [node name="WallNorth" parent="Walls" instance=ExtResource("2_wall")]
-transform = Transform3D(1.2, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -14)
+transform = Transform3D(1.2, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, -16)
 
 [node name="WallSouth" parent="Walls" instance=ExtResource("2_wall")]
-transform = Transform3D(1.2, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 14)
+transform = Transform3D(1.2, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 16)
 
 [node name="WallWest" parent="Walls" instance=ExtResource("2_wall")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1.2, -14, 3, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1.4, -16, 5, 0)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="WallEastTop" parent="Walls" instance=ExtResource("2_wall")]
+transform = Transform3D(0.5, 0, 0, 0, 1, 0, 0, 0, 0.5, 16, 5, -10)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="WallEastBottom" parent="Walls" instance=ExtResource("2_wall")]
+transform = Transform3D(0.5, 0, 0, 0, 1, 0, 0, 0, 0.5, 16, 5, 10)
 rotation_degrees = Vector3(0, 90, 0)
 
 [node name="Floor" parent="." instance=ExtResource("1_floor")]
-transform = Transform3D(1.4, 0, 0, 0, 1, 0, 0, 0, 1.4, 0, 0, 0)
+transform = Transform3D(1.3, 0, 0, 0, 1, 0, 0, 0, 1.3, 0, 0, 0)
 
-[node name="CentralHub" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+[node name="CentralHub" parent="." instance=ExtResource("4_platform")]
+transform = Transform3D(1.25, 0, 0, 0, 1, 0, 0, 0, 1.5, 0, 1.5, 0)
 
-[node name="Mesh" type="MeshInstance3D" parent="CentralHub"]
-mesh = SubResource("mesh_main_platform")
-material_override = SubResource("mat_path_main")
+[node name="MainPathForward" parent="." instance=ExtResource("4_platform")]
+transform = Transform3D(1, 0, 0, 0, 0.8, 0, 0, 0, 2, 0, 1.3, -8)
 
-[node name="Collision" type="CollisionShape3D" parent="CentralHub"]
-shape = SubResource("shape_main")
+[node name="MainPathBack" parent="." instance=ExtResource("4_platform")]
+transform = Transform3D(1, 0, 0, 0, 0.8, 0, 0, 0, 2, 0, 1.3, 8)
 
-[node name="MainPathForward" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, -7)
+[node name="BranchPath" parent="." instance=ExtResource("4_platform")]
+transform = Transform3D(1, 0, 0, 0, 0.8, 0, 0, 0, 1, 8, 2.5, 0)
 
-[node name="Mesh" type="MeshInstance3D" parent="MainPathForward"]
-mesh = SubResource("mesh_branch_path")
-material_override = SubResource("mat_path_main")
+[node name="BranchRamp" parent="." instance=ExtResource("5_ramp")]
+transform = Transform3D(-3.49691e-08, -0.258819, 0.931752, 0, 0.965926, 0.24965, -0.8, 8.73033e-09, -3.37774e-08, 4, 2, 0)
 
-[node name="Collision" type="CollisionShape3D" parent="MainPathForward"]
-shape = SubResource("shape_branch")
+[node name="SafetyRails" type="Node3D" parent="."]
 
-[node name="MainPathBack" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 7)
+[node name="PathForwardRailL" parent="SafetyRails" instance=ExtResource("6_rail")]
+transform = Transform3D(0, 0, 1.5, 0, 1, 0, -0.5, 0, 0, -4.2, 1.8, -8)
 
-[node name="Mesh" type="MeshInstance3D" parent="MainPathBack"]
-mesh = SubResource("mesh_branch_path")
-material_override = SubResource("mat_path_main")
+[node name="PathForwardRailR" parent="SafetyRails" instance=ExtResource("6_rail")]
+transform = Transform3D(0, 0, 1.5, 0, 1, 0, -0.5, 0, 0, 4.2, 1.8, -8)
 
-[node name="Collision" type="CollisionShape3D" parent="MainPathBack"]
-shape = SubResource("shape_branch")
+[node name="PathBackRailL" parent="SafetyRails" instance=ExtResource("6_rail")]
+transform = Transform3D(0, 0, 1.5, 0, 1, 0, -0.5, 0, 0, -4.2, 1.8, 8)
 
-[node name="BranchPath" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 2.5, 0)
-rotation_degrees = Vector3(0, 90, 8)
+[node name="PathBackRailR" parent="SafetyRails" instance=ExtResource("6_rail")]
+transform = Transform3D(0, 0, 1.5, 0, 1, 0, -0.5, 0, 0, 4.2, 1.8, 8)
 
-[node name="Mesh" type="MeshInstance3D" parent="BranchPath"]
-mesh = SubResource("mesh_branch_path")
-material_override = SubResource("mat_path_branch")
+[node name="BranchRailTop" parent="SafetyRails" instance=ExtResource("6_rail")]
+transform = Transform3D(0.75, 0, 0, 0, 1, 0, 0, 0, 1, 8, 3, -3.5)
 
-[node name="Collision" type="CollisionShape3D" parent="BranchPath"]
-shape = SubResource("shape_branch")
+[node name="BranchRailBottom" parent="SafetyRails" instance=ExtResource("6_rail")]
+transform = Transform3D(0.75, 0, 0, 0, 1, 0, 0, 0, 1, 8, 3, 3.5)
 
-[node name="BranchRamp" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 2, 0)
-rotation_degrees = Vector3(0, 90, 15)
+[node name="Pillar1" parent="." instance=ExtResource("3_column")]
+transform = Transform3D(1.25, 0, 0, 0, 1.5, 0, 0, 0, 1.25, -6, 4, -6)
 
-[node name="Mesh" type="MeshInstance3D" parent="BranchRamp"]
-mesh = SubResource("mesh_branch_path")
-scale = Vector3(0.8, 1, 0.6)
-material_override = SubResource("mat_path_branch")
-
-[node name="Collision" type="CollisionShape3D" parent="BranchRamp"]
-shape = SubResource("shape_branch")
-
-[node name="Pillar1" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 4, -5)
-
-[node name="Mesh" type="MeshInstance3D" parent="Pillar1"]
-mesh = SubResource("mesh_pillar_wide")
-material_override = SubResource("mat_rock")
-
-[node name="Collision" type="CollisionShape3D" parent="Pillar1"]
-shape = SubResource("shape_pillar")
-
-[node name="Pillar2" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 4, 5)
-
-[node name="Mesh" type="MeshInstance3D" parent="Pillar2"]
-mesh = SubResource("mesh_pillar_wide")
-material_override = SubResource("mat_rock")
-
-[node name="Collision" type="CollisionShape3D" parent="Pillar2"]
-shape = SubResource("shape_pillar")
+[node name="Pillar2" parent="." instance=ExtResource("3_column")]
+transform = Transform3D(1.25, 0, 0, 0, 1.5, 0, 0, 0, 1.25, 6, 4, 6)
 
 [node name="PathMarkers" type="Node3D" parent="."]
 
 [node name="MainMarker" type="MeshInstance3D" parent="PathMarkers"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -5)
 mesh = SubResource("mesh_marker")
 material_override = SubResource("mat_glow_warm")
 
 [node name="BranchMarker" type="MeshInstance3D" parent="PathMarkers"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 3.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 3.5, 0)
 mesh = SubResource("mesh_marker")
 material_override = SubResource("mat_glow_cool")
 
 [node name="Lighting" type="Node3D" parent="."]
 
 [node name="HubLight" type="OmniLight3D" parent="Lighting"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, 0)
 light_color = Color(0.9, 0.8, 0.7, 1)
 light_energy = 0.7
-omni_range = 12.0
+omni_range = 15.0
 
 [node name="BranchLight" type="OmniLight3D" parent="Lighting"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 6, 0)
 light_color = Color(0.5, 0.7, 0.8, 1)
 light_energy = 0.5
-omni_range = 8.0
+omni_range = 10.0

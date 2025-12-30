@@ -7,6 +7,20 @@ class_name LevelAssembler
 @export var exit_group: StringName = &"chunk_exit"
 @export var branch_spacing: float = 22.0
 
+@export var spawn_prob_enemy: float = 0.3
+@export var spawn_prob_hazard: float = 0.2
+
+var _enemy_scenes = [
+	preload("res://scenes/enemies/basic_enemy.tscn"),
+	preload("res://scenes/enemies/turret_enemy.tscn"),
+	preload("res://scenes/enemies/seeker_enemy.tscn")
+]
+
+var _hazard_scenes = [
+	preload("res://scenes/hazards/lava_pool.tscn"),
+	preload("res://scenes/hazards/spike_trap.tscn")
+]
+
 func _ready() -> void:
 	if not use_generator:
 		return
@@ -78,29 +92,98 @@ func assemble_level() -> void:
 		# Apply biome coloring
 		var depth = metadata.get("depth", 0)
 		_apply_biome_coloring(room, depth)
+		
+		# Populate props
+		_populate_room(room, depth)
 
 		if exit_marker:
 			previous_exits[branch_index] = exit_marker
 			if room_id != "":
 				room_exit_map[room_id] = exit_marker
 
-func _apply_biome_coloring(room: Node, depth: int) -> void:
-	# Biome Colors
-	var surface_color = Color(0.8, 0.9, 1.0) # Cool White
-	var toxic_color = Color(0.2, 0.8, 0.4)   # Toxic Green
-	var crystal_color = Color(0.6, 0.2, 0.9) # Purple
-	var magma_color = Color(1.0, 0.4, 0.1)   # Orange/Red
+func _populate_room(room: Node3D, depth: int) -> void:
+	# Use predefined markers if available
+	var prop_markers = room.find_children("PropMarker*", "Marker3D")
+	if not prop_markers.is_empty():
+		for marker in prop_markers:
+			_spawn_prop_at(marker.global_position, depth)
+		return
+
+	# Fallback: Try to spawn in valid locations
+	# This is simple/naive: Picking random points and raycasting down
+	var attempts = 3 + int(depth * 0.5)
+	for i in range(attempts):
+		var rand_pos = room.global_position + Vector3(randf_range(-6, 6), 2, randf_range(-6, 6))
+		_try_spawn_prop(rand_pos, depth)
+
+func _try_spawn_prop(pos: Vector3, depth: int) -> void:
+	var space_state = get_world_3d().direct_space_state
+	var query = PhysicsRayQueryParameters3D.create(pos, pos + Vector3.DOWN * 5.0)
+	var result = space_state.intersect_ray(query)
 	
-	var target_color = surface_color
-	if depth >= 2 and depth < 4:
-		target_color = toxic_color
-	elif depth >= 4 and depth < 6:
-		target_color = crystal_color
-	elif depth >= 6:
-		target_color = magma_color
-		
-	# Find all lights recursively
-	_tint_lights_recursive(room, target_color)
+	if result:
+		var hit_pos = result.position
+		_spawn_prop_at(hit_pos, depth)
+
+func _spawn_prop_at(pos: Vector3, depth: int) -> void:
+	if randf() < spawn_prob_enemy:
+		var enemy_scene = _pick_enemy(depth)
+		if enemy_scene:
+			var enemy = enemy_scene.instantiate()
+			add_child(enemy)
+			enemy.global_position = pos + Vector3.UP * 0.5
+	
+	elif randf() < spawn_prob_hazard:
+		var hazard_scene = _pick_hazard(depth)
+		if hazard_scene:
+			var hazard = hazard_scene.instantiate()
+			add_child(hazard)
+			hazard.global_position = pos
+
+func _pick_enemy(depth: int) -> PackedScene:
+	# Difficulty progression
+	if depth < 2:
+		return _enemy_scenes[0] # Basic
+	elif depth < 5:
+		return _enemy_scenes[randi() % 2] # Basic or Turret
+	else:
+		return _enemy_scenes[randi() % _enemy_scenes.size()] # Any
+
+func _pick_hazard(_depth: int) -> PackedScene:
+	return _hazard_scenes[randi() % _hazard_scenes.size()]
+
+func _apply_biome_coloring(room: Node, depth: int) -> void:
+	# Use MaterialLibrary for proper biome-based material and light tinting
+	if MaterialLibrary.instance:
+		MaterialLibrary.instance.apply_biome_to_node(room, depth)
+	else:
+		# Fallback to legacy light tinting
+		var biome_colors = {
+			0: Color(0.8, 0.9, 1.0),  # Surface - cool white
+			2: Color(0.2, 0.8, 0.4),  # Toxic - green
+			4: Color(0.6, 0.2, 0.9),  # Crystal - purple
+			6: Color(1.0, 0.4, 0.1),  # Magma - orange
+		}
+		var target_color = biome_colors.get(0)
+		for threshold in biome_colors.keys():
+			if depth >= threshold:
+				target_color = biome_colors[threshold]
+		_tint_lights_recursive(room, target_color)
+	
+	# Start ambient effects for the room
+	var biome := _get_biome_name_for_depth(depth)
+	var room_id := "room_%d" % room.get_instance_id()
+	FXHelper.start_room_ambient(room, room_id, biome)
+
+func _get_biome_name_for_depth(depth: int) -> String:
+	if depth < 2:
+		return "cave"
+	elif depth < 4:
+		return "toxic"
+	elif depth < 6:
+		return "crystal"
+	else:
+		return "magma"
 
 func _tint_lights_recursive(node: Node, color: Color) -> void:
 	if node is Light3D:

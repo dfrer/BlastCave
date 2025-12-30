@@ -1,0 +1,127 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/kit/cave_floor.tscn" id="1_floor"]
+[ext_resource type="PackedScene" path="res://scenes/kit/cave_wall.tscn" id="2_wall"]
+[ext_resource type="PackedScene" path="res://scenes/kit/cave_platform.tscn" id="3_platform"]
+[ext_resource type="PackedScene" path="res://scenes/kit/destructible_pillar.tscn" id="4_pillar"]
+[ext_resource type="PackedScene" path="res://scenes/pickup_explosive.tscn" id="5_pickup"]
+[ext_resource type="PackedScene" path="res://scenes/kit/safety_rail.tscn" id="6_rail"]
+
+[sub_resource type="StandardMaterial3D" id="mat_hazard"]
+albedo_color = Color(0.6, 0.2, 0.2, 1)
+roughness = 0.7
+
+[sub_resource type="BoxMesh" id="mesh_narrow"]
+size = Vector3(4, 0.5, 8)
+
+[sub_resource type="BoxShape3D" id="shape_narrow"]
+size = Vector3(4, 0.5, 8)
+
+[node name="Room11PrecisionMaze" type="Node3D"]
+
+[node name="Entry" type="Marker3D" parent="." groups=["chunk_entry"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1, 10)
+
+[node name="Exit" type="Marker3D" parent="." groups=["chunk_exit"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1, -10)
+
+[node name="Geometry" type="Node3D" parent="."]
+
+[node name="Floor" parent="Geometry" instance=ExtResource("1_floor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2, 0)
+
+[node name="WallNorth" parent="Geometry" instance=ExtResource("2_wall")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, -14)
+
+[node name="WallSouth" parent="Geometry" instance=ExtResource("2_wall")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 14)
+
+[node name="WallEast" parent="Geometry" instance=ExtResource("2_wall")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1.2, 14, 4, 0)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="WallWest" parent="Geometry" instance=ExtResource("2_wall")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1.2, -14, 4, 0)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="NarrowPaths" type="Node3D" parent="."]
+
+[node name="Path1" parent="NarrowPaths" instance=ExtResource("3_platform")]
+transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 1.5, -6, 0, 6)
+
+[node name="Path1RailL" parent="NarrowPaths" instance=ExtResource("6_rail")]
+transform = Transform3D(0, 0, 1.2, 0, 1, 0, -0.5, 0, 0, -8.5, 0.7, 6)
+
+[node name="Path1RailR" parent="NarrowPaths" instance=ExtResource("6_rail")]
+transform = Transform3D(0, 0, 1.2, 0, 1, 0, -0.5, 0, 0, -3.5, 0.7, 6)
+
+[node name="Path2" parent="NarrowPaths" instance=ExtResource("3_platform")]
+transform = Transform3D(0, 0, 1.5, 0, 0.6, 0, -0.6, 0, 0, 0, 1, 0)
+
+[node name="Path2RailTop" parent="NarrowPaths" instance=ExtResource("6_rail")]
+transform = Transform3D(1.2, 0, 0, 0, 1, 0, 0, 0, 0.5, 0, 1.7, -2.5)
+
+[node name="Path2RailBot" parent="NarrowPaths" instance=ExtResource("6_rail")]
+transform = Transform3D(1.2, 0, 0, 0, 1, 0, 0, 0, 0.5, 0, 1.7, 2.5)
+
+[node name="Path3" parent="NarrowPaths" instance=ExtResource("3_platform")]
+transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 1.5, 6, 2, -6)
+
+[node name="Path3RailL" parent="NarrowPaths" instance=ExtResource("6_rail")]
+transform = Transform3D(0, 0, 1.2, 0, 1, 0, -0.5, 0, 0, 3.5, 2.7, -6)
+
+[node name="Path3RailR" parent="NarrowPaths" instance=ExtResource("6_rail")]
+transform = Transform3D(0, 0, 1.2, 0, 1, 0, -0.5, 0, 0, 8.5, 2.7, -6)
+
+[node name="Platforms" type="Node3D" parent="."]
+
+[node name="Platform1" parent="Platforms" instance=ExtResource("3_platform")]
+transform = Transform3D(0.75, 0, 0, 0, 1, 0, 0, 0, 0.75, -10, 0, 2)
+
+[node name="Platform2" parent="Platforms" instance=ExtResource("3_platform")]
+transform = Transform3D(0.75, 0, 0, 0, 1, 0, 0, 0, 0.75, 10, 3, 0)
+
+[node name="Platform3" parent="Platforms" instance=ExtResource("3_platform")]
+transform = Transform3D(0.75, 0, 0, 0, 1, 0, 0, 0, 0.75, 0, 4, -10)
+
+[node name="Pillars" type="Node3D" parent="."]
+
+[node name="Pillar1" parent="Pillars" instance=ExtResource("4_pillar")]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, -4, 0, 2)
+
+[node name="Pillar2" parent="Pillars" instance=ExtResource("4_pillar")]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 4, 0, -4)
+
+[node name="Lighting" type="Node3D" parent="."]
+
+[node name="MainLight" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0)
+light_color = Color(0.7, 0.75, 0.85, 1)
+light_energy = 0.6
+omni_range = 28.0
+
+[node name="EntryLight" type="SpotLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -8, 5, 10)
+light_color = Color(0.3, 0.9, 0.5, 1)
+light_energy = 1.0
+spot_range = 10.0
+spot_angle = 30.0
+
+[node name="ExitLight" type="SpotLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 8, 5, -10)
+light_color = Color(0.3, 0.9, 0.5, 1)
+light_energy = 1.0
+spot_range = 10.0
+spot_angle = 30.0
+
+[node name="Pickups" type="Node3D" parent="."]
+
+[node name="Pickup1" parent="Pickups" instance=ExtResource("5_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 1, 6)
+explosive_type = "DelayedCharge"
+amount = 3
+
+[node name="Pickup2" parent="Pickups" instance=ExtResource("5_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 3, -6)
+explosive_type = "ImpulseCharge"
+amount = 3

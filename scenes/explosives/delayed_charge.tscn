@@ -44,8 +44,9 @@ size = Vector3(0.3, 0.15, 0.4)
 
 [node name="DelayedCharge" type="Node3D"]
 script = ExtResource("1_script")
-blast_force = 18.0
-blast_radius = 8.0
+blast_force = 40.0
+blast_radius = 9.0
+upward_bias = 0.35
 
 [node name="Brick" type="MeshInstance3D" parent="."]
 mesh = SubResource("mesh_brick")

@@ -14,6 +14,7 @@ class_name HUD
 @onready var stuck_warning: Label = $BottomVisor/VBox/StuckWarning
 @onready var character_label: Label = $LeftVisor/Panel/VBox/CharacterLabel
 
+var _explosive_hotbar: ExplosiveHotbar
 var _health_component: HealthComponent
 var _roguelike_state: RoguelikeState
 var _player: CharacterObject
@@ -24,6 +25,7 @@ func _ready() -> void:
 	call_deferred("_attach_roguelike_state")
 	call_deferred("_attach_player")
 	call_deferred("_attach_run_controller")
+	call_deferred("_setup_explosive_hotbar")
 	if stuck_warning:
 		stuck_warning.visible = false
 
@@ -33,6 +35,11 @@ func _process(_delta: float) -> void:
 func set_selected_type(type_name: String) -> void:
 	if selected_label:
 		selected_label.text = "ORDNANCE: %s" % type_name.to_upper().replace("CHARGE", "")
+	# Update hotbar selection
+	if _explosive_hotbar:
+		var index = _explosive_hotbar.explosive_types.find(type_name)
+		if index >= 0:
+			_explosive_hotbar.set_selected(index)
 
 func set_counts(counts: Dictionary) -> void:
 	if not counts_container:
@@ -194,3 +201,22 @@ func _on_ability_cooldown_changed(cooldown_remaining: float, cooldown_max: float
 
 func _on_stuck_warning_changed(time_remaining: float, is_stuck: bool) -> void:
 	set_stuck_warning(time_remaining, is_stuck)
+
+func _setup_explosive_hotbar() -> void:
+	# Create the explosive hotbar and add it to the bottom center
+	_explosive_hotbar = ExplosiveHotbar.new()
+	_explosive_hotbar.name = "ExplosiveHotbar"
+	
+	# Position at bottom center
+	var hotbar_container = Control.new()
+	hotbar_container.name = "HotbarContainer"
+	hotbar_container.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	hotbar_container.offset_top = -80
+	hotbar_container.offset_bottom = 0
+	add_child(hotbar_container)
+	
+	# Add the hotbar centered
+	_explosive_hotbar.set_anchors_preset(Control.PRESET_CENTER)
+	_explosive_hotbar.position.x = -105  # Offset for 3 slots of ~70px each
+	_explosive_hotbar.position.y = -30
+	hotbar_container.add_child(_explosive_hotbar)

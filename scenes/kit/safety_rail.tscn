@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3]
+
+[sub_resource type="StandardMaterial3D" id="mat_rail"]
+albedo_color = Color(0.35, 0.33, 0.3, 0.9)
+roughness = 0.7
+metallic = 0.15
+
+[sub_resource type="BoxMesh" id="mesh_rail"]
+size = Vector3(8, 0.5, 0.3)
+
+[sub_resource type="BoxShape3D" id="shape_rail"]
+size = Vector3(8, 0.5, 0.3)
+
+[node name="SafetyRail" type="StaticBody3D"]
+
+[node name="RailMesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("mesh_rail")
+material_override = SubResource("mat_rail")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+shape = SubResource("shape_rail")

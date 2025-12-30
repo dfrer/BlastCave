@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/explosives/repulsor_charge.gd" id="1_script"]
+
+[sub_resource type="StandardMaterial3D" id="mat_repulsor"]
+albedo_color = Color(0.5, 0.2, 0.6, 1)
+emission_enabled = true
+emission = Color(0.7, 0.3, 0.9, 1)
+emission_energy_multiplier = 2.0
+roughness = 0.3
+
+[sub_resource type="TorusMesh" id="mesh_repulsor"]
+inner_radius = 0.1
+outer_radius = 0.25
+rings = 12
+ring_segments = 16
+
+[sub_resource type="SphereShape3D" id="shape_repulsor"]
+radius = 0.25
+
+[node name="RepulsorCharge" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("mesh_repulsor")
+material_override = SubResource("mat_repulsor")
+
+[node name="Body" type="StaticBody3D" parent="."]
+
+[node name="Collision" type="CollisionShape3D" parent="Body"]
+shape = SubResource("shape_repulsor")

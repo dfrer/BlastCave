@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" path="res://scenes/kit/cave_wall.tscn" id="2_wall"]
 [ext_resource type="PackedScene" path="res://scenes/levels/destructible_block.tscn" id="3_block"]
 [ext_resource type="PackedScene" path="res://scenes/kit/cave_column.tscn" id="4_column"]
+[ext_resource type="PackedScene" path="res://scenes/kit/cave_platform.tscn" id="5_platform"]
 
 [sub_resource type="StandardMaterial3D" id="mat_rock"]
 albedo_color = Color(0.3, 0.28, 0.25, 1)
@@ -52,15 +53,8 @@ transform = Transform3D(1.5, 0, 0, 0, 1, 0, 0, 0, 1.5, 0, 0, 0)
 
 [node name="Platforms" type="Node3D" parent="."]
 
-[node name="HighPlatform" type="StaticBody3D" parent="Platforms"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12, -8)
-
-[node name="Mesh" type="MeshInstance3D" parent="Platforms/HighPlatform"]
-mesh = SubResource("mesh_platform")
-material_override = SubResource("mat_rock")
-
-[node name="Collision" type="CollisionShape3D" parent="Platforms/HighPlatform"]
-shape = SubResource("shape_platform")
+[node name="HighPlatform" parent="Platforms" instance=ExtResource("5_platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1.33, 0, 12, -8)
 
 [node name="DestructibleCeiling" type="Node3D" parent="."]
 
