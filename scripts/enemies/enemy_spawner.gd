@@ -45,9 +45,10 @@ func _spawn_enemy() -> void:
 	if point:
 		if point.is_inside_tree():
 			spawn_pos = point.global_position
-	instance.global_position = spawn_pos
-	if get_parent():
-		get_parent().add_child.call_deferred(instance)
+	var parent = get_parent()
+	if parent:
+		instance.position = parent.to_local(spawn_pos)
+		parent.add_child.call_deferred(instance)
 	_spawned.append(instance)
 
 func _cleanup_spawned() -> void:
