@@ -4,19 +4,20 @@ class_name FXHelper
 static func spawn_burst(parent: Node, position: Vector3, color: Color, amount: int = 16, lifetime: float = 0.6) -> void:
 	if parent == null:
 		return
-	var particles = CPUParticles3D.new()
+	var particles = GPUParticles3D.new()
 	particles.amount = amount
 	particles.lifetime = lifetime
 	particles.one_shot = true
 	particles.emitting = true
 	particles.speed_scale = 2.0
-	particles.color = color
-	particles.initial_velocity = 6.0
-	particles.spread = 180.0
-	if parent is Node3D and parent.is_inside_tree():
-		particles.global_position = position
-	elif parent is Node3D:
-		particles.position = position
+	var material = ParticleProcessMaterial.new()
+	material.initial_velocity_min = 6.0
+	material.initial_velocity_max = 6.0
+	material.spread = 180.0
+	material.color = color
+	particles.process_material = material
+	if parent is Node3D:
+		particles.position = parent.to_local(position)
 	parent.add_child.call_deferred(particles)
 	if parent.get_tree():
 		parent.get_tree().create_timer(lifetime).timeout.connect(particles.queue_free)
@@ -29,10 +30,8 @@ static func spawn_sfx(parent: Node, position: Vector3, pitch: float = 1.0) -> vo
 	var player = AudioStreamPlayer3D.new()
 	player.pitch_scale = pitch
 	player.volume_db = -8.0
-	if parent is Node3D and parent.is_inside_tree():
-		player.global_position = position
-	elif parent is Node3D:
-		player.position = position
+	if parent is Node3D:
+		player.position = parent.to_local(position)
 	parent.add_child.call_deferred(player)
 	if parent.get_tree():
 		parent.get_tree().create_timer(0.3).timeout.connect(player.queue_free)
